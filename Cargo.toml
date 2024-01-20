@@ -1,0 +1,13 @@
+[package]
+name = "razorblade"
+version = "0.1.0"
+edition = "2021"
+authors = ["Dilshad <a-rustacean@outlook.com>"]
+
+[dependencies]
+chrono = { version = "0.4.31", features = ["serde"] }
+data-encoding = "2.5.0"
+reqwest = { version = "0.11.23", features = ["json"] }
+ring = "0.17.7"
+serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.108"
