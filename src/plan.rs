@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::{
     api::RequestParams,
     common::{Collection, Currency, FilterOptions, Object},
@@ -7,8 +5,9 @@ use crate::{
     subscription::SubscriptionItem,
     Razorpay,
 };
-use chrono::{serde::ts_milliseconds, DateTime, Utc};
+use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 
 #[derive(Debug, Default, Serialize)]
 pub struct CreatePlanItemOptions {
@@ -43,7 +42,7 @@ pub struct Plan {
     pub period: PlanPeriod,
     pub item: SubscriptionItem,
     pub notes: Object,
-    #[serde(with = "ts_milliseconds")]
+    #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
 }
 

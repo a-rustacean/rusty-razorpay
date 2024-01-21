@@ -1,5 +1,5 @@
 use crate::common::{Currency, Object};
-use chrono::{serde::ts_milliseconds, DateTime, Utc};
+use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -111,7 +111,7 @@ pub struct Payment {
     pub fee: u64,
     pub tax: u64,
     pub notes: Object,
-    #[serde(with = "ts_milliseconds")]
+    #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
     pub card_id: Option<String>,
     pub card: Option<PaymentCard>,

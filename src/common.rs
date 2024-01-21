@@ -1,4 +1,4 @@
-use chrono::{serde::ts_milliseconds_option, DateTime, Utc};
+use chrono::{serde::ts_seconds_option, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -24,12 +24,12 @@ pub struct Collection<T> {
 pub struct FilterOptions {
     #[serde(
         skip_serializing_if = "Option::is_none",
-        with = "ts_milliseconds_option"
+        with = "ts_seconds_option"
     )]
     pub from: Option<DateTime<Utc>>,
     #[serde(
         skip_serializing_if = "Option::is_none",
-        with = "ts_milliseconds_option"
+        with = "ts_seconds_option"
     )]
     pub to: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]

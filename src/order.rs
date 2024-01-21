@@ -6,7 +6,7 @@ use crate::{
     util::serialize_bool_as_int_option,
     Razorpay,
 };
-use chrono::{serde::ts_milliseconds, DateTime, Utc};
+use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::fmt::Display;
@@ -79,7 +79,7 @@ pub struct Order {
     pub status: OrderStatus,
     pub notes: Object,
     pub attempts: u32,
-    #[serde(with = "ts_milliseconds")]
+    #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
 }
 

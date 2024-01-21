@@ -7,7 +7,7 @@ use crate::{
     Razorpay,
 };
 use chrono::{
-    serde::{ts_milliseconds, ts_milliseconds_option},
+    serde::{ts_seconds, ts_seconds_option},
     DateTime, Utc,
 };
 use serde::{Deserialize, Serialize};
@@ -47,12 +47,12 @@ pub struct CreateSubscriptionOptions {
     pub quantity: Option<u64>,
     #[serde(
         skip_serializing_if = "Option::is_none",
-        with = "ts_milliseconds_option"
+        with = "ts_seconds_option"
     )]
     pub start_at: Option<DateTime<Utc>>,
     #[serde(
         skip_serializing_if = "Option::is_none",
-        with = "ts_milliseconds_option"
+        with = "ts_seconds_option"
     )]
     pub expire_by: Option<DateTime<Utc>>,
     #[serde(
@@ -89,7 +89,7 @@ pub struct UpdateSubscriptionOptions {
     pub remaining_count: Option<u64>,
     #[serde(
         skip_serializing_if = "Option::is_none",
-        with = "ts_milliseconds_option"
+        with = "ts_seconds_option"
     )]
     pub start_at: Option<DateTime<Utc>>,
     pub schedule_change_at: SubscriptionChangeSchedule,
@@ -106,9 +106,9 @@ pub struct SubscriptionItem {
     pub unit_amount: u64,
     pub currency: Currency,
     pub description: Option<String>,
-    #[serde(with = "ts_milliseconds")]
+    #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
-    #[serde(with = "ts_milliseconds")]
+    #[serde(with = "ts_seconds")]
     pub updated_at: DateTime<Utc>,
     pub r#type: SubscriptionItemType,
 }
@@ -142,23 +142,23 @@ pub struct Subscription {
     pub customer_id: Option<String>,
     pub total_cound: u8,
     pub customer_notify: bool,
-    #[serde(with = "ts_milliseconds")]
+    #[serde(with = "ts_seconds")]
     pub start_at: DateTime<Utc>,
     pub quantity: u64,
     pub notes: Object,
     pub addons: Vec<Addon>,
     pub status: SubscriptionStatus,
     pub paid_count: u64,
-    #[serde(with = "ts_milliseconds")]
+    #[serde(with = "ts_seconds")]
     pub current_start: DateTime<Utc>,
-    #[serde(with = "ts_milliseconds")]
+    #[serde(with = "ts_seconds")]
     pub current_end: DateTime<Utc>,
-    #[serde(with = "ts_milliseconds_option")]
+    #[serde(with = "ts_seconds_option")]
     pub ended_at: Option<DateTime<Utc>>,
-    #[serde(with = "ts_milliseconds")]
+    #[serde(with = "ts_seconds")]
     pub charge_at: DateTime<Utc>,
     pub auth_attemps: u64,
-    #[serde(with = "ts_milliseconds")]
+    #[serde(with = "ts_seconds")]
     pub expire_by: DateTime<Utc>,
     pub offer_id: Option<String>,
     pub short_url: String,
