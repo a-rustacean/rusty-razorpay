@@ -597,18 +597,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "razorblade"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "data-encoding",
- "reqwest",
- "ring",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "redox_syscall"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -686,6 +674,18 @@ dependencies = [
  "libc",
  "linux-raw-sys",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "rusty-razorpay"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "data-encoding",
+ "reqwest",
+ "ring",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
