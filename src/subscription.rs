@@ -3,7 +3,7 @@ use crate::{
     api::RequestParams,
     common::{Collection, Currency, FilterOptions, Object},
     error::{InternalApiResult, RazorpayResult},
-    util::serialize_bool_as_int_option,
+    util::{deserialize_notes, serialize_bool_as_int_option},
     Razorpay,
 };
 use chrono::{
@@ -145,6 +145,7 @@ pub struct Subscription {
     #[serde(with = "ts_seconds")]
     pub start_at: DateTime<Utc>,
     pub quantity: u64,
+    #[serde(deserialize_with = "deserialize_notes")]
     pub notes: Object,
     pub addons: Vec<Addon>,
     pub status: SubscriptionStatus,

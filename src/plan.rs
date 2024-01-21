@@ -3,6 +3,7 @@ use crate::{
     common::{Collection, Currency, FilterOptions, Object},
     error::{InternalApiResult, RazorpayResult},
     subscription::SubscriptionItem,
+    util::deserialize_notes,
     Razorpay,
 };
 use chrono::{serde::ts_seconds, DateTime, Utc};
@@ -41,6 +42,7 @@ pub struct Plan {
     pub interval: u8,
     pub period: PlanPeriod,
     pub item: SubscriptionItem,
+    #[serde(deserialize_with = "deserialize_notes")]
     pub notes: Object,
     #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,

@@ -1,4 +1,7 @@
-use crate::common::{Currency, Object};
+use crate::{
+    common::{Currency, Object},
+    util::deserialize_notes,
+};
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::Deserialize;
 
@@ -110,6 +113,7 @@ pub struct Payment {
     pub contact: String,
     pub fee: u64,
     pub tax: u64,
+    #[serde(deserialize_with = "deserialize_notes")]
     pub notes: Object,
     #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,

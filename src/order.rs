@@ -3,7 +3,7 @@ use crate::{
     common::{Collection, Currency, FilterOptions, Object},
     error::{InternalApiResult, RazorpayResult},
     payment::Payment,
-    util::serialize_bool_as_int_option,
+    util::{deserialize_notes, serialize_bool_as_int_option},
     Razorpay,
 };
 use chrono::{serde::ts_seconds, DateTime, Utc};
@@ -77,6 +77,7 @@ pub struct Order {
     pub offer_id: Option<String>,
     pub payments: Option<Collection<Payment>>,
     pub status: OrderStatus,
+    #[serde(deserialize_with = "deserialize_notes")]
     pub notes: Object,
     pub attempts: u32,
     #[serde(with = "ts_seconds")]
