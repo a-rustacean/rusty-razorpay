@@ -1,6 +1,6 @@
 # Rusty Razorpay
 
-Razorpay client for Rust, WIP.
+Razorpay sdk for Rust, WIP.
 
 ## Usage
 
