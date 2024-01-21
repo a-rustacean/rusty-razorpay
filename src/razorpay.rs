@@ -19,7 +19,7 @@ impl Razorpay {
         Self {
             api: Api::new(ApiOptions {
                 base_url: BASE_URL.to_owned(),
-                user_agent: format!("razorblade@{}", VERSION),
+                user_agent: format!("rusty-razorpay@{}", VERSION),
                 key_id: options.key_id,
                 key_secret: options.key_secret,
                 headers: options.headers.unwrap_or_default(),
