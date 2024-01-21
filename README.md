@@ -7,3 +7,28 @@ Razorpay sdk for Rust, WIP.
 ```
 rusty-razorpay = { git = "https://github.com/a-rustacean/rusty-razorpay" }
 ```
+
+## Progress
+
+- [ ] Account
+- [x] Addon
+- [ ] Card
+- [ ] Customer
+- [ ] Fund account
+- [ ] IINS
+- [ ] Invoice
+- [ ] Item
+- [x] Order
+- [ ] Payment
+- [ ] Payment link
+- [x] Plan
+- [ ] Product
+- [ ] QR Code
+- [ ] Refund
+- [ ] Settlement
+- [ ] Stakeholders
+- [x] Subscription
+- [ ] Token
+- [ ] Transfer
+- [ ] Virtual account
+- [ ] Webhook
