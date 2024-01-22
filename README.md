@@ -1,10 +1,12 @@
 # Rusty Razorpay
 
-Razorpay sdk for Rust, WIP.
+Rusty Razorpay is an unofficial Rust SDK for Razorpay, currently a work in progress. Please note that this library is in the early stages of development, and nothing has been tested yet. The API and features are subject to change without prior notice.
 
-## Usage
+## Installation
 
-```
+To use Rusty Razorpay in your project, add the following line to your `Cargo.toml` file:
+
+```toml
 rusty-razorpay = { git = "https://github.com/a-rustacean/rusty-razorpay" }
 ```
 
@@ -34,3 +36,15 @@ rusty-razorpay = { git = "https://github.com/a-rustacean/rusty-razorpay" }
 - [ ] Transfer
 - [ ] Virtual account
 - [ ] Webhook
+
+## Important Notice
+
+This library is currently under active development, and no testing has been performed yet. Therefore, it is not recommended for use in a production environment at this time. Additionally, be aware that the API may undergo significant changes as development progresses.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## Contributions
+
+Contributions are welcome! Feel free to open issues, submit pull requests, or provide feedback to help improve Rusty Razorpay. Before contributing, please review the [Contribution Guidelines](CONTRIBUTING.md).
