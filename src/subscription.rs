@@ -14,13 +14,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::fmt::Display;
 
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum SubscriptionItemType {
-    Plan,
-    Addon,
-}
-
 #[derive(Debug, Default, Serialize)]
 pub struct CreateSubscriptionAddonItemOptions {
     pub name: String,
@@ -70,7 +63,7 @@ pub struct CreateSubscriptionOptions {
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct AllSubscriptionOptions {
+pub struct AllSubscriptionsOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub plan_id: Option<String>,
     #[serde(flatten)]
@@ -95,22 +88,6 @@ pub struct UpdateSubscriptionOptions {
     pub schedule_change_at: SubscriptionChangeSchedule,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub customer_notify: Option<bool>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct SubscriptionItem {
-    pub id: String,
-    pub name: String,
-    pub active: bool,
-    pub amount: u64,
-    pub unit_amount: u64,
-    pub currency: Currency,
-    pub description: Option<String>,
-    #[serde(with = "ts_seconds")]
-    pub created_at: DateTime<Utc>,
-    #[serde(with = "ts_seconds")]
-    pub updated_at: DateTime<Utc>,
-    pub r#type: SubscriptionItemType,
 }
 
 #[derive(Debug, Deserialize)]
@@ -140,7 +117,7 @@ pub struct Subscription {
     pub entity: String,
     pub plan_id: String,
     pub customer_id: Option<String>,
-    pub total_cound: u8,
+    pub total_count: u8,
     pub customer_notify: bool,
     #[serde(with = "ts_seconds")]
     pub start_at: DateTime<Utc>,
@@ -158,7 +135,7 @@ pub struct Subscription {
     pub ended_at: Option<DateTime<Utc>>,
     #[serde(with = "ts_seconds")]
     pub charge_at: DateTime<Utc>,
-    pub auth_attemps: u64,
+    pub auth_attempts: u64,
     #[serde(with = "ts_seconds")]
     pub expire_by: DateTime<Utc>,
     pub offer_id: Option<String>,
@@ -212,7 +189,7 @@ impl Subscription {
 
     pub async fn all(
         razorpay: &Razorpay,
-        data: AllSubscriptionOptions,
+        data: AllSubscriptionsOptions,
     ) -> RazorpayResult<Collection<Subscription>> {
         let res = razorpay
             .api
