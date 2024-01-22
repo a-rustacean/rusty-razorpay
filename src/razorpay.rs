@@ -5,7 +5,7 @@ const BASE_URL: &str = "https://api.razorpay.com";
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub struct Razorpay {
-    api: Api,
+    pub(crate) api: Api,
 }
 
 pub struct RazorpayOptions {
