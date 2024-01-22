@@ -208,6 +208,7 @@ impl Api {
             .await
     }
 
+    #[allow(dead_code)]
     pub async fn post_form_data<T, R>(
         &self,
         params: RequestParams<T>,
