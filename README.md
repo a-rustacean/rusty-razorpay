@@ -26,8 +26,8 @@ rusty-razorpay = { git = "https://github.com/a-rustacean/rusty-razorpay" }
 - [x] Plan
 - [ ] Product
 - [ ] QR Code
-- [ ] Refund
 - [ ] Settlement
+- [x] Refund
 - [ ] Stakeholders
 - [x] Subscription
 - [ ] Token
