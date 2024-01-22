@@ -21,7 +21,7 @@ rusty-razorpay = { git = "https://github.com/a-rustacean/rusty-razorpay" }
 - [x] Document
 - [x] Item
 - [x] Order
-- [ ] Payment
+- [x] Payment
 - [ ] Payment link
 - [x] Plan
 - [ ] Product
