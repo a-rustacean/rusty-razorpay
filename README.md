@@ -10,7 +10,7 @@ rusty-razorpay = { git = "https://github.com/a-rustacean/rusty-razorpay" }
 
 ## Progress
 
-- [ ] Account
+- [x] Account
 - [x] Addon
 - [ ] Card
 - [ ] Customer
