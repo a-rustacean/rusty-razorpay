@@ -15,4 +15,4 @@ disallowed-names = [
   "isize",
   "usize",
 ]
-msrv = "1.68.2"
+msrv = "1.63.0"
