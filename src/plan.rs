@@ -2,7 +2,7 @@ use crate::{
     api::RequestParams,
     common::{Collection, Currency, FilterOptions, Object},
     error::{InternalApiResult, RazorpayResult},
-    subscription::SubscriptionItem,
+    item::Item,
     util::deserialize_notes,
     Razorpay,
 };
@@ -41,7 +41,7 @@ pub struct Plan {
     pub entity: String,
     pub interval: u8,
     pub period: PlanPeriod,
-    pub item: SubscriptionItem,
+    pub item: Item,
     #[serde(deserialize_with = "deserialize_notes")]
     pub notes: Object,
     #[serde(with = "ts_seconds")]
