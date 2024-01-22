@@ -17,6 +17,7 @@ rusty-razorpay = { git = "https://github.com/a-rustacean/rusty-razorpay" }
 - [ ] Fund account
 - [ ] IINS
 - [ ] Invoice
+- [x] Dispute
 - [x] Item
 - [x] Order
 - [ ] Payment
