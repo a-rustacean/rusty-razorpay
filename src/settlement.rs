@@ -167,16 +167,19 @@ pub struct CreateInstantSettlement {
 }
 
 impl Settlement {
-    pub async fn all(
+    pub async fn all<T>(
         razorpay: &Razorpay,
-        data: Filter,
-    ) -> RazorpayResult<Collection<Settlement>> {
+        data: T,
+    ) -> RazorpayResult<Collection<Settlement>>
+    where
+        T: Into<Option<Filter>>,
+    {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/settlements".to_owned(),
                 version: None,
-                data: Some(data),
+                data: data.into(),
             })
             .await?;
 
