@@ -14,8 +14,8 @@ use serde::{Deserialize, Serialize};
 pub struct Customer {
     pub id: String,
     pub name: String,
-    pub contact: String,
-    pub email: String,
+    pub contact: Option<String>,
+    pub email: Option<String>,
     pub gstin: Option<String>,
     #[serde(deserialize_with = "deserialize_notes")]
     pub notes: Object,
@@ -26,8 +26,10 @@ pub struct Customer {
 #[derive(Debug, Default, Serialize)]
 pub struct CreateCustomer {
     pub name: String,
-    pub contact: String,
-    pub email: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
     #[serde(
         serialize_with = "serialize_bool_as_int_option",
         skip_serializing_if = "Option::is_none"
@@ -41,14 +43,19 @@ pub struct CreateCustomer {
 
 #[derive(Debug, Serialize)]
 pub struct UpdateCustomer {
-    pub name: String,
-    pub email: String,
-    pub contact: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact: Option<String>,
 }
 
 #[derive(Debug, Default, Serialize)]
 pub struct AllCustomers {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub count: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub skip: Option<u64>,
 }
 
