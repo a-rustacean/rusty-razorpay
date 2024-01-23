@@ -66,8 +66,8 @@ pub struct CreateSubscription {
 pub struct AllSubscriptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub plan_id: Option<String>,
-    #[serde(flatten)]
-    pub filter: Filter,
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    pub filter: Option<Filter>,
 }
 
 #[derive(Debug, Serialize)]
