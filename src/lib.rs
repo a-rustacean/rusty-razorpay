@@ -3,6 +3,7 @@ mod razorpay;
 
 pub mod account;
 pub mod addon;
+pub mod address;
 pub mod card;
 pub mod common;
 pub mod customer;
