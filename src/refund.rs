@@ -41,13 +41,18 @@ pub struct Refund {
     #[serde(deserialize_with = "deserialize_notes")]
     pub notes: Object,
     pub receipt: Option<String>,
-    // TODO: look at it later
-    //
+    pub acquirer_data: Value,
+    //  ^^^^^^^^^^^^^
+    //        |
+    //         "----------------------------------------.
+    //                                                   "
+    // TODO: look at it later                            |
+    //                                                   |
     // The [docs] aren't clear, about the schema of `acquirer_data`, so
-    // needs some testing is needed before coming up with a robust type
+    // more testing is needed before coming up with a robust type
     //
     // [docs]: https://razorpay.com/docs/api/refunds/
-    pub acquirer_data: Value,
+    //
     pub status: RefundStatus,
     pub speed_requested: Option<RefundSpeed>,
     pub speed_processed: Option<RefundSpeed>,

@@ -123,16 +123,23 @@ pub struct SettlementRecon {
     pub settled_at: Option<DateTime<Utc>>,
     pub settlement_id: Option<String>,
     pub description: Option<String>,
-    // TODO: look at it later
-    //
-    // I don't know TF is wrong with the [docs], but it says
-    // the type of notes should be `object`, that's okay,
+    #[serde(deserialize_with = "deserialize_notes")]
+    pub notes: Object,
+    //  ^^^^^
+    //    |
+    //     "--------------------------------------------------.
+    //                                                         |
+    // TODO: look at it later                                  |
+    //                                                         |
+    // I don't know TF is wrong with the [docs], but it says   |
+    // the type of `notes` should be `object`, that's okay,    |
+    //                |                                        |
+    //                 "--------------------------------------"
     // but every single example payload have a string in
     // the place instead, haven't tested it yet
     //
     // [docs]: https://razorpay.com/docs/api/settlements/fetch-recon/
-    #[serde(deserialize_with = "deserialize_notes")]
-    pub notes: Object,
+    //
     pub payment_id: Option<String>,
     pub settlement_utr: Option<String>,
     pub order_id: Option<String>,
