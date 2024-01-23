@@ -489,8 +489,11 @@ pub struct BusinessAddresses {
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct LegalInfo {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub pan: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub gst: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cin: Option<String>,
 }
 
