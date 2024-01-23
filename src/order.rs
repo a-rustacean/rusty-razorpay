@@ -43,8 +43,8 @@ pub enum OrderExpand {
 
 #[derive(Debug, Serialize, Default)]
 pub struct AllOrders {
-    #[serde(flatten)]
-    pub filter: Filter,
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    pub filter: Option<Filter>,
     #[serde(
         skip_serializing_if = "Option::is_none",
         serialize_with = "serialize_bool_as_int_option"
