@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::{
     api::RequestParams,
-    common::{Collection, Currency, FilterOptions, Object},
+    common::{Collection, Currency, Filter, Object},
     error::{InternalApiResult, RazorpayResult},
     util::deserialize_notes,
     Razorpay,
@@ -54,7 +54,7 @@ pub struct Refund {
 }
 
 #[derive(Debug, Serialize, Default)]
-pub struct CreateRefundOptions {
+pub struct CreateRefund {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,7 +68,7 @@ pub struct CreateRefundOptions {
 impl Refund {
     pub async fn all(
         razorpay: &Razorpay,
-        data: FilterOptions,
+        data: Filter,
     ) -> RazorpayResult<Collection<Refund>> {
         let res = razorpay
             .api

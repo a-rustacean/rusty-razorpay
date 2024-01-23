@@ -1,8 +1,8 @@
 use crate::{
     api::RequestParams,
-    common::{Collection, FilterOptions},
+    common::{Collection, Filter},
     error::{InternalApiResult, RazorpayResult},
-    item::{CreateItemOptions, Item},
+    item::{CreateItem, Item},
     Razorpay,
 };
 use chrono::{serde::ts_seconds, DateTime, Utc};
@@ -21,8 +21,8 @@ pub struct Addon {
 }
 
 #[derive(Debug, Serialize)]
-pub struct CreateAddonOptions {
-    pub item: CreateItemOptions,
+pub struct CreateAddon {
+    pub item: CreateItem,
     pub quantity: u64,
 }
 
@@ -30,7 +30,7 @@ impl Addon {
     pub async fn create<T>(
         razorpay: &Razorpay,
         subscription_id: T,
-        data: CreateAddonOptions,
+        data: CreateAddon,
     ) -> RazorpayResult<Addon>
     where
         T: Display,
@@ -52,7 +52,7 @@ impl Addon {
 
     pub async fn all(
         razorpay: &Razorpay,
-        data: FilterOptions,
+        data: Filter,
     ) -> RazorpayResult<Collection<Addon>> {
         let res = razorpay
             .api

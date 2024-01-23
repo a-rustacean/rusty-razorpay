@@ -1,6 +1,6 @@
 use crate::{
     api::RequestParams,
-    common::{Collection, Currency, FilterOptions, Object},
+    common::{Collection, Currency, Filter, Object},
     error::{InternalApiResult, RazorpayResult},
     item::Item,
     util::deserialize_notes,
@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 #[derive(Debug, Default, Serialize)]
-pub struct CreatePlanItemOptions {
+pub struct CreatePlanItem {
     pub name: String,
     pub amount: u64,
     pub currency: Currency,
@@ -19,11 +19,11 @@ pub struct CreatePlanItemOptions {
 }
 
 #[derive(Debug, Serialize)]
-pub struct CreatePlanOptions {
+pub struct CreatePlan {
     pub interval: u8,
     pub period: PlanPeriod,
     pub notes: Object,
-    pub item: CreatePlanItemOptions,
+    pub item: CreatePlanItem,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -51,7 +51,7 @@ pub struct Plan {
 impl Plan {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreatePlanOptions,
+        data: CreatePlan,
     ) -> RazorpayResult<Plan> {
         let res = razorpay
             .api
@@ -73,7 +73,7 @@ impl Plan {
         filter: T,
     ) -> RazorpayResult<Collection<Plan>>
     where
-        T: Into<Option<FilterOptions>>,
+        T: Into<Option<Filter>>,
     {
         let res = razorpay
             .api

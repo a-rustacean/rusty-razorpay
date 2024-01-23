@@ -565,22 +565,22 @@ pub struct Account {
 }
 
 #[derive(Debug, Serialize)]
-pub struct CreateAccountAddressesOptions {
+pub struct CreateAccountAddresses {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub operation: Option<Address>,
     pub registered: Address,
 }
 
 #[derive(Debug, Serialize)]
-pub struct CreateAccountProfileOptions {
+pub struct CreateAccountProfile {
     pub category: BusinessCategory,
     pub subcategory: BusinessSubCategory,
     pub business_model: String,
-    pub addresses: CreateAccountAddressesOptions,
+    pub addresses: CreateAccountAddresses,
 }
 
 #[derive(Debug, Serialize)]
-pub struct CreateAccountOptions {
+pub struct CreateAccount {
     pub email: String,
     pub phone: u64,
     pub legal_business_name: String,
@@ -590,7 +590,7 @@ pub struct CreateAccountOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reference_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub profile: Option<CreateAccountProfileOptions>,
+    pub profile: Option<CreateAccountProfile>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub legal_info: Option<LegalInfo>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -606,7 +606,7 @@ pub struct CreateAccountOptions {
 impl Account {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreateAccountOptions,
+        data: CreateAccount,
     ) -> RazorpayResult<Account> {
         let res = razorpay
             .api

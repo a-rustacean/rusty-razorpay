@@ -1,10 +1,10 @@
 use crate::{
     api::RequestParams,
     card::{Card, CardType},
-    common::{Collection, Currency, FilterOptions, Object},
+    common::{Collection, Currency, Filter, Object},
     error::{InternalApiResult, RazorpayResult},
     offer::Offer,
-    refund::{CreateRefundOptions, Refund},
+    refund::{CreateRefund, Refund},
     util::deserialize_notes,
     Razorpay,
 };
@@ -116,7 +116,7 @@ pub struct Payment {
 }
 
 #[derive(Debug, Serialize)]
-pub struct CapturePaymentOptions {
+pub struct CapturePayment {
     pub amount: u64,
     pub currency: Currency,
 }
@@ -138,10 +138,10 @@ pub enum AllPaymentsExpand {
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct AllPaymentsOptions {
+pub struct AllPayments {
     #[serde(rename = "expand[]")]
     pub expand: Vec<AllPaymentsExpand>,
-    pub filter: Option<FilterOptions>,
+    pub filter: Option<Filter>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -256,7 +256,7 @@ impl Payment {
     pub async fn capture<T>(
         razorpay: &Razorpay,
         payment_id: T,
-        data: CapturePaymentOptions,
+        data: CapturePayment,
     ) -> RazorpayResult<Payment>
     where
         T: Display,
@@ -303,7 +303,7 @@ impl Payment {
 
     pub async fn all(
         razorpay: &Razorpay,
-        data: AllPaymentsOptions,
+        data: AllPayments,
     ) -> RazorpayResult<Collection<Payment>> {
         let res = razorpay
             .api
@@ -410,7 +410,7 @@ impl Payment {
     pub async fn refund<T>(
         razorpay: &Razorpay,
         payment_id: T,
-        data: CreateRefundOptions,
+        data: CreateRefund,
     ) -> RazorpayResult<Refund>
     where
         T: Display,
@@ -433,7 +433,7 @@ impl Payment {
     pub async fn all_refunds<T>(
         razorpay: &Razorpay,
         payment_id: T,
-        data: FilterOptions,
+        data: Filter,
     ) -> RazorpayResult<Collection<Refund>>
     where
         T: Display,

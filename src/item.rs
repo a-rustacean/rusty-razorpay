@@ -1,6 +1,6 @@
 use crate::{
     api::RequestParams,
-    common::{Collection, Currency, FilterOptions},
+    common::{Collection, Currency, Filter},
     error::{InternalApiResult, RazorpayResult},
     Razorpay,
 };
@@ -43,7 +43,7 @@ pub struct Item {
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct CreateItemOptions {
+pub struct CreateItem {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -52,7 +52,7 @@ pub struct CreateItemOptions {
 }
 
 #[derive(Debug, Serialize)]
-pub struct UpdateItemOptions {
+pub struct UpdateItem {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -66,17 +66,17 @@ pub struct UpdateItemOptions {
 }
 
 #[derive(Debug, Serialize)]
-pub struct AllItemsOptions {
+pub struct AllItems {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none", flatten)]
-    pub filter: Option<FilterOptions>,
+    pub filter: Option<Filter>,
 }
 
 impl Item {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreateItemOptions,
+        data: CreateItem,
     ) -> RazorpayResult<Item> {
         let res = razorpay
             .api
@@ -117,7 +117,7 @@ impl Item {
 
     pub async fn all(
         razorpay: &Razorpay,
-        data: AllItemsOptions,
+        data: AllItems,
     ) -> RazorpayResult<Collection<Item>> {
         let res = razorpay
             .api
@@ -137,7 +137,7 @@ impl Item {
     pub async fn update<T>(
         razorpay: &Razorpay,
         item_id: T,
-        data: UpdateItemOptions,
+        data: UpdateItem,
     ) -> RazorpayResult<Item>
     where
         T: Display,

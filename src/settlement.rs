@@ -1,7 +1,7 @@
 use crate::{
     api::RequestParams,
     card::{CardNetwork, CardType},
-    common::{Collection, Currency, FilterOptions, Object},
+    common::{Collection, Currency, Filter, Object},
     error::{InternalApiResult, RazorpayResult},
     payment::PaymentMethod,
     util::deserialize_notes,
@@ -145,7 +145,7 @@ pub struct SettlementRecon {
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct FetchReconOptions {
+pub struct FetchRecon {
     pub year: u16,
     pub month: u8,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -157,7 +157,7 @@ pub struct FetchReconOptions {
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct CreateInstantSettlementOptions {
+pub struct CreateInstantSettlement {
     pub amount: u64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub settle_full_balance: Option<bool>,
@@ -169,7 +169,7 @@ pub struct CreateInstantSettlementOptions {
 impl Settlement {
     pub async fn all(
         razorpay: &Razorpay,
-        data: FilterOptions,
+        data: Filter,
     ) -> RazorpayResult<Collection<Settlement>> {
         let res = razorpay
             .api
@@ -210,7 +210,7 @@ impl Settlement {
 
     pub async fn fetch_recon(
         razorpay: &Razorpay,
-        data: FetchReconOptions,
+        data: FetchRecon,
     ) -> RazorpayResult<SettlementRecon> {
         let res = razorpay
             .api
@@ -229,7 +229,7 @@ impl Settlement {
 
     pub async fn create_instant(
         razorpay: &Razorpay,
-        data: CreateInstantSettlementOptions,
+        data: CreateInstantSettlement,
     ) -> RazorpayResult<InstantSettlement> {
         let res = razorpay
             .api

@@ -24,7 +24,7 @@ pub struct Customer {
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct CreateCustomerOptions {
+pub struct CreateCustomer {
     pub name: String,
     pub contact: String,
     pub email: String,
@@ -40,14 +40,14 @@ pub struct CreateCustomerOptions {
 }
 
 #[derive(Debug, Serialize)]
-pub struct UpdateCustomerOptions {
+pub struct UpdateCustomer {
     pub name: String,
     pub email: String,
     pub contact: String,
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct AllCustomersOptions {
+pub struct AllCustomers {
     pub count: Option<u8>,
     pub skip: Option<u64>,
 }
@@ -55,7 +55,7 @@ pub struct AllCustomersOptions {
 impl Customer {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreateCustomerOptions,
+        data: CreateCustomer,
     ) -> RazorpayResult<Customer> {
         let res = razorpay
             .api
@@ -75,7 +75,7 @@ impl Customer {
     pub async fn update<T>(
         razorpay: &Razorpay,
         customer_id: T,
-        data: UpdateCustomerOptions,
+        data: UpdateCustomer,
     ) -> RazorpayResult<Customer>
     where
         T: Display,
@@ -97,7 +97,7 @@ impl Customer {
 
     pub async fn all(
         razorpay: &Razorpay,
-        data: AllCustomersOptions,
+        data: AllCustomers,
     ) -> RazorpayResult<Collection<Customer>> {
         let res = razorpay
             .api

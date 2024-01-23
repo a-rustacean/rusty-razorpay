@@ -84,7 +84,7 @@ pub enum ContestDisputeAction {
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct ContestDisputeOptions {
+pub struct ContestDispute {
     pub amount: u64,
     pub summary: String,
     pub shipping_proof: Option<Vec<String>>,
@@ -167,7 +167,7 @@ impl Dispute {
     pub async fn contest<T>(
         razorpay: &Razorpay,
         dispute_id: T,
-        data: ContestDisputeOptions,
+        data: ContestDispute,
     ) -> RazorpayResult<Dispute>
     where
         T: Display,

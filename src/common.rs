@@ -21,7 +21,7 @@ pub struct Collection<T> {
 }
 
 #[derive(Debug, Serialize, Default)]
-pub struct FilterOptions {
+pub struct Filter {
     #[serde(
         skip_serializing_if = "Option::is_none",
         with = "ts_seconds_option"

@@ -1,6 +1,6 @@
 use crate::{
     api::RequestParams,
-    common::{Collection, Currency, FilterOptions, Object},
+    common::{Collection, Currency, Filter, Object},
     error::{InternalApiResult, RazorpayResult},
     payment::Payment,
     util::{deserialize_notes, serialize_bool_as_int_option},
@@ -19,7 +19,7 @@ pub struct OrderBankAccount {
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct CreateOrderOptions {
+pub struct CreateOrder {
     pub amount: u64,
     pub currency: Currency,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -42,9 +42,9 @@ pub enum OrderExpand {
 }
 
 #[derive(Debug, Serialize, Default)]
-pub struct AllOrdersOptions {
+pub struct AllOrders {
     #[serde(flatten)]
-    pub filter: FilterOptions,
+    pub filter: Filter,
     #[serde(
         skip_serializing_if = "Option::is_none",
         serialize_with = "serialize_bool_as_int_option"
@@ -87,7 +87,7 @@ pub struct Order {
 impl Order {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreateOrderOptions,
+        data: CreateOrder,
     ) -> RazorpayResult<Order> {
         let res = razorpay
             .api
@@ -106,7 +106,7 @@ impl Order {
 
     pub async fn all(
         razorpay: &Razorpay,
-        data: AllOrdersOptions,
+        data: AllOrders,
     ) -> RazorpayResult<Collection<Order>> {
         let res = razorpay
             .api

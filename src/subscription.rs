@@ -1,7 +1,7 @@
 use crate::{
     addon::Addon,
     api::RequestParams,
-    common::{Collection, Currency, FilterOptions, Object},
+    common::{Collection, Currency, Filter, Object},
     error::{InternalApiResult, RazorpayResult},
     util::{deserialize_notes, serialize_bool_as_int_option},
     Razorpay,
@@ -15,25 +15,25 @@ use serde_json::json;
 use std::fmt::Display;
 
 #[derive(Debug, Default, Serialize)]
-pub struct CreateSubscriptionAddonItemOptions {
+pub struct CreateSubscriptionAddonItem {
     pub name: String,
     pub amount: u64,
     pub currency: Currency,
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct CreateSubscriptionAddonOptions {
-    pub item: CreateSubscriptionAddonItemOptions,
+pub struct CreateSubscriptionAddon {
+    pub item: CreateSubscriptionAddonItem,
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct CreateSubscriptionNotifyInfoOptions {
+pub struct CreateSubscriptionNotifyInfo {
     pub notify_email: String,
     pub notify_phone: String,
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct CreateSubscriptionOptions {
+pub struct CreateSubscription {
     pub plan_id: String,
     pub total_count: u64,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,25 +53,25 @@ pub struct CreateSubscriptionOptions {
         serialize_with = "serialize_bool_as_int_option"
     )]
     pub customer_notify: Option<bool>,
-    pub addons: Vec<CreateSubscriptionAddonOptions>,
+    pub addons: Vec<CreateSubscriptionAddon>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offer_id: Option<String>,
     #[serde(skip_serializing_if = "Object::is_empty")]
     pub notes: Object,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub notify_info: Option<CreateSubscriptionNotifyInfoOptions>,
+    pub notify_info: Option<CreateSubscriptionNotifyInfo>,
 }
 
 #[derive(Debug, Default, Serialize)]
-pub struct AllSubscriptionsOptions {
+pub struct AllSubscriptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub plan_id: Option<String>,
     #[serde(flatten)]
-    pub filter: FilterOptions,
+    pub filter: Filter,
 }
 
 #[derive(Debug, Serialize)]
-pub struct UpdateSubscriptionOptions {
+pub struct UpdateSubscription {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub plan_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -148,7 +148,7 @@ pub struct Subscription {
 impl Subscription {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreateSubscriptionOptions,
+        data: CreateSubscription,
     ) -> RazorpayResult<Subscription> {
         let res = razorpay
             .api
@@ -189,7 +189,7 @@ impl Subscription {
 
     pub async fn all(
         razorpay: &Razorpay,
-        data: AllSubscriptionsOptions,
+        data: AllSubscriptions,
     ) -> RazorpayResult<Collection<Subscription>> {
         let res = razorpay
             .api
@@ -239,7 +239,7 @@ impl Subscription {
     pub async fn update<T>(
         razorpay: &Razorpay,
         subscription_id: T,
-        data: UpdateSubscriptionOptions,
+        data: UpdateSubscription,
     ) -> RazorpayResult<Subscription>
     where
         T: Display,
