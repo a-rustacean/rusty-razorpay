@@ -141,6 +141,7 @@ pub enum AllPaymentsExpand {
 pub struct AllPayments {
     #[serde(rename = "expand[]")]
     pub expand: Vec<AllPaymentsExpand>,
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub filter: Option<Filter>,
 }
 
