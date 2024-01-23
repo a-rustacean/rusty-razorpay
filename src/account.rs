@@ -155,19 +155,22 @@ pub enum BusinessSubCategory {
     WeaponsAndAmmunitions,
     StampsAndCoinsStores,
     OfficeEquipment,
-    // Should remove this `e`
-    //                 |
-    //                  "-.
-    //                     |
+//
+//
+//     Should remove this `e`
+//                     |
+//                      "-.
+//                         |
     AutomobilePartsAndEquipements,
-    //                ^^^^^^^^^^^
-    //
-    // TODO: fix this typo
-    //
-    // There's a type in the [docs], but it could also be that the razorpay
-    // server have it too, needs more testing
-    //
-    // [docs]: https://razorpay.com/docs/partners/aggregators/onboarding-api/appendix/
+//                    ^^^^^^^^^^^
+//
+//     TODO: fix this typo
+//
+//     There's a type in the [docs], but it could also be that the razorpay
+//     server have it too, needs more testing
+//
+//     [docs]: https://razorpay.com/docs/partners/aggregators/onboarding-api/appendix/
+//
     GardenSupplyStores,
     HouseholdApplianceStores,
     NonDurableGoods,
@@ -211,18 +214,21 @@ pub enum BusinessSubCategory {
     WatchAndJewelleryRepairStores,
     LiquorStores,
     BoatDealers,
-    // Should remove this `e`, or add an `s` after that `e` to make it
-    // plural          |
-    //                  "----------.
-    //                              |
+//
+//     Should remove this `e`, or add an `s` after that `e` to make it
+//     plural          |
+//                      "----------.
+//                                  |
     OpticiansOpticalGoodsAndEyeglasseStores,
-    //                      ^^^^^^^^^
-    // TODO: fix this typo
-    //
-    // There's a type in the [docs], but it could also be that the razorpay
-    // server have it too, needs more testing
-    //
-    // [docs]: https://razorpay.com/docs/partners/aggregators/onboarding-api/appendix/
+//                          ^^^^^^^^^
+//
+//     TODO: fix this typo
+//
+//     There's a type in the [docs], but it could also be that the razorpay
+//     server have it too, needs more testing
+//
+//     [docs]: https://razorpay.com/docs/partners/aggregators/onboarding-api/appendix/
+//
     WholesaleFootwearStores,
     CosmeticStores,
     HomeFurnishingStores,
@@ -296,7 +302,21 @@ pub enum BusinessSubCategory {
     DirectMarketing,
     Lottery,
     VeterinaryServices,
+//
+//     Should add an `i` after this `f` to fix the typo
+//                               |
+//     .------------------------"
+//    |
     AffliatedAutoRental,
+//  ^^^^^^^^^
+//
+//     TODO: fix this typo
+//
+//     There's a type in the [docs], but it could also be that the razorpay
+//     server have it too, needs more testing
+//
+//     [docs]: https://razorpay.com/docs/partners/aggregators/onboarding-api/appendix/
+//
     AlimonyAndChildSupport,
     AirportFlyingFields,
     GolfCourses,
