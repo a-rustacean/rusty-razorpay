@@ -66,16 +66,19 @@ pub struct CreateRefund {
 }
 
 impl Refund {
-    pub async fn all(
+    pub async fn all<T>(
         razorpay: &Razorpay,
-        data: Filter,
-    ) -> RazorpayResult<Collection<Refund>> {
+        data: T,
+    ) -> RazorpayResult<Collection<Refund>>
+    where
+        T: Into<Option<Filter>>,
+    {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/refunds".to_owned(),
                 version: None,
-                data: Some(data),
+                data: data.into(),
             })
             .await?;
 
