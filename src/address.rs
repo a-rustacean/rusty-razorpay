@@ -1,6 +1,6 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum AddressType {
     #[serde(rename = "billing_address")]
     Billing,
@@ -8,13 +8,14 @@ pub enum AddressType {
     Shipping,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Address {
     pub id: String,
     pub r#type: AddressType,
     pub primary: bool,
     pub line1: String,
-    pub line2: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub line2: Option<String>,
     pub city: String,
     pub zipcode: String,
     pub state: String,
