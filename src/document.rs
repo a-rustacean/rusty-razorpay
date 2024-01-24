@@ -40,14 +40,12 @@ pub struct Document {
 }
 
 impl Document {
-    //
     // TODO: add api for creating document
     //
     // This time it's not the [docs]' fault it's just that I hate the multipart
     // thing so left it for the end
     //
     // [docs]: https://razorpay.com/docs/api/documents/create
-    //
 
     pub async fn fetch<T>(
         razorpay: &Razorpay,
@@ -71,7 +69,6 @@ impl Document {
         }
     }
 
-    //
     // TODO: add api for fetching contents of a document
     //
     // It will take more time as the contents of the document would be
@@ -79,5 +76,4 @@ impl Document {
     // add a method to allow us to get the raw body
     //
     // [docs]: https://razorpay.com/docs/api/documents/fetch-content
-    //
 }

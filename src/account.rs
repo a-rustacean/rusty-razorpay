@@ -155,7 +155,6 @@ pub enum BusinessSubCategory {
     WeaponsAndAmmunitions,
     StampsAndCoinsStores,
     OfficeEquipment,
-    //
     // Should remove this `e` to fix the typo
     //                 |
     //                  "-.
@@ -169,7 +168,6 @@ pub enum BusinessSubCategory {
     // server have it too, needs more testing
     //
     // [docs]: https://razorpay.com/docs/partners/aggregators/onboarding-api/appendix/
-    //
     GardenSupplyStores,
     HouseholdApplianceStores,
     NonDurableGoods,
@@ -213,7 +211,6 @@ pub enum BusinessSubCategory {
     WatchAndJewelleryRepairStores,
     LiquorStores,
     BoatDealers,
-    //
     // Should remove this `e`, or add an `s` after that `e` to make it
     // plural          |
     //                  "----------.
@@ -227,7 +224,6 @@ pub enum BusinessSubCategory {
     // server have it too, needs more testing
     //
     // [docs]: https://razorpay.com/docs/partners/aggregators/onboarding-api/appendix/
-    //
     WholesaleFootwearStores,
     CosmeticStores,
     HomeFurnishingStores,
@@ -315,7 +311,6 @@ pub enum BusinessSubCategory {
     // server have it too, needs more testing
     //
     // [docs]: https://razorpay.com/docs/partners/aggregators/onboarding-api/appendix/
-    //
     AlimonyAndChildSupport,
     AirportFlyingFields,
     GolfCourses,
@@ -667,14 +662,12 @@ impl Account {
         }
     }
 
-    //
     // TODO: Add update api
     //
     // It isn't clear in the [docs] which of the field can be
     // updated, so needs more research
     //
     // [docs]: https://razorpay.com/docs/api/partners/account-onboarding/update/
-    //
 
     pub async fn delete<T>(
         razorpay: &Razorpay,

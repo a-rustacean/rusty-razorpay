@@ -237,7 +237,6 @@ pub enum WebhookPayloadItem {
     Dispute(Dispute),
     Invoice(Invoice),
     Subscription(Subscription),
-    //
     // TODO: Add missing webhook payload item
     //
     // the following items need to be implemented, the workaround for now is
@@ -250,13 +249,15 @@ pub enum WebhookPayloadItem {
     // PaymentLink(PaymentLink),                             |
     // FundAccountValidation(FundAccountValidation),         |
     // Payout(Payout),                                       |
-    // PayoutLink(PayoutLink),
-    // MerchantProduct(MerchantProduct),
+    // PayoutLink(PayoutLink),                               |
+    // MerchantProduct(MerchantProduct),                     |
     Account(Account),
-    // PayoutDowntime(PayoutDowntime),
-    // Transaction(Transaction),
-    //
-    Other(Value), //^^^^^^^^^^
+    // PayoutDowntime(PayoutDowntime),                       |
+    // Transaction(Transaction),                             |
+    Other(Value),
+    //^^^^^^^^^^                                             |
+    //    |                                                  |
+    //     "------------------------------------------------"
 }
 
 #[derive(Debug, Deserialize)]

@@ -193,12 +193,10 @@ impl Invoice {
         }
     }
 
-    //
     // TODO: Add more invoice APIs
     //
     // there are many other APIs which needs to be implemented, all of
     // them are list in the [docs]
     //
     // [docs]: https://razorpay.com/docs/api/payments/invoices
-    //
 }

@@ -52,7 +52,6 @@ pub struct Refund {
     // more testing is needed before coming up with a robust type
     //
     // [docs]: https://razorpay.com/docs/api/refunds/
-    //
     pub status: RefundStatus,
     pub speed_requested: Option<RefundSpeed>,
     pub speed_processed: Option<RefundSpeed>,

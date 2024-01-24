@@ -139,7 +139,6 @@ pub struct SettlementRecon {
     // the place instead, haven't tested it yet
     //
     // [docs]: https://razorpay.com/docs/api/settlements/fetch-recon/
-    //
     pub payment_id: Option<String>,
     pub settlement_utr: Option<String>,
     pub order_id: Option<String>,
