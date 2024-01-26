@@ -1,13 +1,39 @@
 use crate::{
-    account::Account, dispute::Dispute, invoice::Invoice, order::Order,
-    payment::Payment, refund::Refund, subscription::Subscription,
+    account::Account, dispute::Dispute, entity::WebhookEntity,
+    invoice::Invoice, order::Order, payment::Payment, refund::Refund,
+    subscription::Subscription, util::generate_webhook_signature,
 };
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::Deserialize;
 use serde_json::Value;
-use std::collections::HashMap;
+use std::{collections::HashMap, error::Error, fmt::Display};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug)]
+pub enum WebhookError {
+    ParseError(serde_json::error::Error),
+    BadSignature,
+}
+
+impl Display for WebhookError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            WebhookError::ParseError(error) => {
+                write!(f, "Parsing error: {}", error)
+            }
+            WebhookError::BadSignature => write!(f, "Bad signature"),
+        }
+    }
+}
+
+impl Error for WebhookError {}
+
+impl From<serde_json::error::Error> for WebhookError {
+    fn from(error: serde_json::error::Error) -> Self {
+        Self::ParseError(error)
+    }
+}
+
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub enum WebhookEvent {
     // Payment events
     #[serde(rename = "payment.authorized")]
@@ -205,7 +231,7 @@ pub enum WebhookEvent {
     TransactionCreated,
 }
 
-#[derive(Debug, Deserialize, Eq, PartialEq, Hash)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq, Hash)]
 #[serde(rename_all = "snake_case")]
 pub enum WebhookPayloadItemName {
     Order,
@@ -228,7 +254,7 @@ pub enum WebhookPayloadItemName {
     Transaction,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(untagged)]
 pub enum WebhookPayloadItem {
     Order(Order),
@@ -260,19 +286,15 @@ pub enum WebhookPayloadItem {
     //     "------------------------------------------------"
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct WebhookPayload {
     pub entity: WebhookPayloadItem,
 }
 
-fn default_event_entity() -> String {
-    "event".to_owned()
-}
-
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct Webhook {
-    #[serde(default = "default_event_entity")]
-    pub entity: String,
+    #[serde(default)]
+    pub entity: WebhookEntity,
     pub account_id: String,
     pub event: WebhookEvent,
     pub contains: Vec<WebhookPayloadItemName>,
@@ -280,4 +302,19 @@ pub struct Webhook {
     pub payload: HashMap<WebhookPayloadItemName, WebhookPayload>,
     #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
+}
+
+impl Webhook {
+    pub fn construct_event(
+        payload: &str,
+        sig: &str,
+        secret: &str,
+    ) -> Result<Webhook, WebhookError> {
+        let expected_sig = generate_webhook_signature(payload, secret);
+        if sig != expected_sig {
+            return Err(WebhookError::BadSignature);
+        }
+
+        Ok(serde_json::from_str(payload)?)
+    }
 }
