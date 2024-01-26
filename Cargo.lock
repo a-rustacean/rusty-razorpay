@@ -678,7 +678,7 @@ dependencies = [
 
 [[package]]
 name = "rusty-razorpay"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "chrono",
  "data-encoding",
@@ -686,6 +686,7 @@ dependencies = [
  "ring",
  "serde",
  "serde_json",
+ "smol_str",
 ]
 
 [[package]]
@@ -776,6 +777,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f92a496fb766b417c996b9c5e57daf2f7ad3b0bebe1ccfca4856390e3d3bb67"
 dependencies = [
  "autocfg",
+]
+
+[[package]]
+name = "smol_str"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e6845563ada680337a52d43bb0b29f396f2d911616f6573012645b9e3d048a49"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
