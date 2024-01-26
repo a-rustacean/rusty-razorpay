@@ -1,32 +1,33 @@
 use crate::{
     api::RequestParams,
     common::{Collection, Currency, Filter, Object},
+    entity::PlanEntity,
     error::{InternalApiResult, RazorpayResult},
+    ids::PlanId,
     item::Item,
     util::deserialize_notes,
     Razorpay,
 };
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
 
-#[derive(Debug, Default, Serialize)]
-pub struct CreatePlanItem {
-    pub name: String,
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct CreatePlanItem<'a> {
+    pub name: &'a str,
     pub amount: u64,
     pub currency: Currency,
-    pub description: Option<String>,
+    pub description: Option<&'a str>,
 }
 
-#[derive(Debug, Serialize)]
-pub struct CreatePlan {
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreatePlan<'a> {
     pub interval: u8,
     pub period: PlanPeriod,
     pub notes: Object,
-    pub item: CreatePlanItem,
+    pub item: CreatePlanItem<'a>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum PlanPeriod {
     Daily,
@@ -35,10 +36,10 @@ pub enum PlanPeriod {
     Yearly,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Plan {
-    pub id: String,
-    pub entity: String,
+    pub id: PlanId,
+    pub entity: PlanEntity,
     pub interval: u8,
     pub period: PlanPeriod,
     pub item: Item,
@@ -51,14 +52,14 @@ pub struct Plan {
 impl Plan {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreatePlan,
+        params: CreatePlan<'_>,
     ) -> RazorpayResult<Plan> {
         let res = razorpay
             .api
             .post(crate::api::RequestParams {
                 url: "/plans".to_string(),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -68,9 +69,9 @@ impl Plan {
         }
     }
 
-    pub async fn all<T>(
+    pub async fn list<T>(
         razorpay: &Razorpay,
-        filter: T,
+        params: T,
     ) -> RazorpayResult<Collection<Plan>>
     where
         T: Into<Option<Filter>>,
@@ -80,7 +81,7 @@ impl Plan {
             .get(RequestParams {
                 url: "/plans".to_owned(),
                 version: None,
-                data: filter.into(),
+                data: params.into(),
             })
             .await?;
 
@@ -90,13 +91,10 @@ impl Plan {
         }
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        plan_id: T,
-    ) -> RazorpayResult<Plan>
-    where
-        T: Display,
-    {
+        plan_id: &PlanId,
+    ) -> RazorpayResult<Plan> {
         let res = razorpay
             .api
             .get(RequestParams {

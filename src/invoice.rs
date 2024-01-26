@@ -2,10 +2,12 @@ use crate::{
     address::Address,
     api::RequestParams,
     common::{Currency, Object},
+    entity::InvoiceEntity,
     error::{InternalApiResult, RazorpayResult},
+    ids::CustomerId,
     line_item::LineItem,
     util::{deserialize_notes, serialize_bool_as_int_option},
-    Razorpay,
+    InvoiceId, OrderId, PaymentId, Razorpay,
 };
 use chrono::{
     serde::{ts_seconds, ts_seconds_option},
@@ -13,13 +15,13 @@ use chrono::{
 };
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum InvoiceType {
     Invoice,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct CustomerDetails {
     pub id: String,
     pub name: String,
@@ -29,7 +31,7 @@ pub struct CustomerDetails {
     pub shipping_address: Option<Address>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum InvoiceStatus {
     Draft,
@@ -41,24 +43,25 @@ pub enum InvoiceStatus {
     Deleted,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum InvoiceMessageStatus {
     Pending,
     Sent,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct Invoice {
-    pub id: String,
-    pub entity: String,
-    pub r#type: InvoiceType,
+    pub id: InvoiceId,
+    pub entity: InvoiceEntity,
+    #[serde(rename = "type")]
+    pub type_: InvoiceType,
     pub invoice_number: String,
-    pub customer_id: Option<String>,
+    pub customer_id: Option<CustomerId>,
     pub customer_details: Option<CustomerDetails>,
-    pub order_id: String,
+    pub order_id: OrderId,
     pub line_items: Vec<LineItem>,
-    pub payment_id: String,
+    pub payment_id: PaymentId,
     pub status: InvoiceStatus,
     #[serde(with = "ts_seconds")]
     pub expire_by: DateTime<Utc>,
@@ -87,45 +90,45 @@ pub struct Invoice {
     pub comment: Option<String>,
 }
 
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum CreateInvoiceType {
     #[default]
     Invoice,
 }
 
-#[derive(Debug, Serialize)]
-pub struct CreateInvoiceCustomerAddress {
-    pub line1: String,
+#[derive(Debug, Serialize, Clone, Eq, PartialEq)]
+pub struct CreateInvoiceCustomerAddress<'a> {
+    pub line1: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub line2: Option<String>,
-    pub city: String,
-    pub zipcode: String,
-    pub state: String,
-    pub country: String,
+    pub line2: Option<&'a str>,
+    pub city: &'a str,
+    pub zipcode: &'a str,
+    pub state: &'a str,
+    pub country: &'a str,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct CreateInvoiceCustomer {
-    pub name: String,
+#[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
+pub struct CreateInvoiceCustomer<'a> {
+    pub name: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
+    pub email: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact: Option<String>,
+    pub contact: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub billing_address: Option<CreateInvoiceCustomerAddress>,
+    pub billing_address: Option<CreateInvoiceCustomerAddress<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub shipping_address: Option<CreateInvoiceCustomerAddress>,
+    pub shipping_address: Option<CreateInvoiceCustomerAddress<'a>>,
 }
 
-#[derive(Debug, Serialize)]
-pub struct CreateInvoiceLineItem {
+#[derive(Debug, Serialize, Clone, Eq, PartialEq)]
+pub struct CreateInvoiceLineItem<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub item_id: Option<String>,
+    pub item_id: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
+    pub name: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
+    pub description: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -134,22 +137,23 @@ pub struct CreateInvoiceLineItem {
     pub quantity: Option<u64>,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct CreateInvoice {
-    pub r#type: CreateInvoiceType,
+#[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
+pub struct CreateInvoice<'a> {
+    #[serde(rename = "type")]
+    pub type_: CreateInvoiceType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
+    pub description: Option<&'a str>,
     #[serde(
         serialize_with = "serialize_bool_as_int_option",
         skip_serializing_if = "Option::is_none"
     )]
     pub draft: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub customer_id: Option<String>,
+    pub customer_id: Option<&'a CustomerId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub customer: Option<CreateInvoiceCustomer>,
+    pub customer: Option<CreateInvoiceCustomer<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub line_items: Option<Vec<CreateInvoiceLineItem>>,
+    pub line_items: Option<Vec<CreateInvoiceLineItem<'a>>>,
     #[serde(
         skip_serializing_if = "Option::is_none",
         with = "ts_seconds_option"
@@ -176,14 +180,14 @@ pub struct CreateInvoice {
 impl Invoice {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreateInvoice,
+        params: CreateInvoice<'_>,
     ) -> RazorpayResult<Invoice> {
         let res = razorpay
             .api
             .post(RequestParams {
                 url: "/invoices".to_owned(),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 

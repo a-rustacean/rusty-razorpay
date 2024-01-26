@@ -1,40 +1,40 @@
 use crate::{
     api::RequestParams,
     common::{Collection, Filter},
+    entity::AddonEntity,
     error::{InternalApiResult, RazorpayResult},
+    ids::{AddonId, SubscriptionId},
     item::{CreateItem, Item},
-    Razorpay,
+    InvoiceId, Razorpay,
 };
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
+use serde_json::Value;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Addon {
-    pub id: String,
+    pub id: AddonId,
+    pub entity: AddonEntity,
     pub item: Item,
     pub quantity: u64,
     #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
     pub subscription_id: String,
-    pub invoice_id: Option<String>,
+    pub invoice_id: Option<InvoiceId>,
 }
 
-#[derive(Debug, Serialize)]
-pub struct CreateAddon {
-    pub item: CreateItem,
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateAddon<'a> {
+    pub item: CreateItem<'a>,
     pub quantity: u64,
 }
 
 impl Addon {
-    pub async fn create<T>(
+    pub async fn create(
         razorpay: &Razorpay,
-        subscription_id: T,
-        data: CreateAddon,
-    ) -> RazorpayResult<Addon>
-    where
-        T: Display,
-    {
+        subscription_id: &SubscriptionId,
+        data: CreateAddon<'_>,
+    ) -> RazorpayResult<Addon> {
         let res = razorpay
             .api
             .post(RequestParams {
@@ -50,16 +50,19 @@ impl Addon {
         }
     }
 
-    pub async fn all(
+    pub async fn list<T>(
         razorpay: &Razorpay,
-        data: Filter,
-    ) -> RazorpayResult<Collection<Addon>> {
+        params: T,
+    ) -> RazorpayResult<Collection<Addon>>
+    where
+        T: Into<Option<Filter>>,
+    {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/addons".to_owned(),
                 version: None,
-                data: Some(data),
+                data: params.into(),
             })
             .await?;
 
@@ -69,13 +72,10 @@ impl Addon {
         }
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        addon_id: T,
-    ) -> RazorpayResult<Addon>
-    where
-        T: Display,
-    {
+        addon_id: &AddonId,
+    ) -> RazorpayResult<Addon> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -91,14 +91,11 @@ impl Addon {
         }
     }
 
-    pub async fn delete<T>(
+    pub async fn delete(
         razorpay: &Razorpay,
-        addon_id: T,
-    ) -> RazorpayResult<()>
-    where
-        T: Display,
-    {
-        let res: InternalApiResult<[u8; 0]> = razorpay
+        addon_id: &AddonId,
+    ) -> RazorpayResult<()> {
+        let res: InternalApiResult<Value> = razorpay
             .api
             .delete(RequestParams {
                 url: format!("/addons/{}", addon_id),

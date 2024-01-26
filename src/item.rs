@@ -2,6 +2,7 @@ use crate::{
     api::RequestParams,
     common::{Collection, Currency, Filter},
     error::{InternalApiResult, RazorpayResult},
+    ids::ItemId,
     Razorpay,
 };
 use chrono::{
@@ -9,9 +10,9 @@ use chrono::{
     DateTime, Utc,
 };
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
+use serde_json::Value;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum ItemType {
     Plan,
@@ -19,9 +20,9 @@ pub enum ItemType {
     Invoice,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Item {
-    pub id: String,
+    pub id: ItemId,
     pub name: String,
     pub active: bool,
     pub amount: u64,
@@ -32,7 +33,8 @@ pub struct Item {
     pub created_at: DateTime<Utc>,
     #[serde(with = "ts_seconds_option")]
     pub updated_at: Option<DateTime<Utc>>,
-    pub r#type: ItemType,
+    #[serde(rename = "type")]
+    pub type_: ItemType,
     pub unit: Option<u64>,
     pub tax_inclusive: Option<bool>,
     pub hsn_code: Option<u32>,
@@ -42,21 +44,21 @@ pub struct Item {
     pub tax_group_id: Option<String>,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct CreateItem {
-    pub name: String,
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateItem<'a> {
+    pub name: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
+    pub description: Option<&'a str>,
     pub amount: u64,
     pub currency: Currency,
 }
 
-#[derive(Debug, Serialize)]
-pub struct UpdateItem {
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct UpdateItem<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
+    pub name: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
+    pub description: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -65,8 +67,8 @@ pub struct UpdateItem {
     pub active: Option<bool>,
 }
 
-#[derive(Debug, Serialize)]
-pub struct AllItems {
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct ListItems {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none", flatten)]
@@ -76,14 +78,14 @@ pub struct AllItems {
 impl Item {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreateItem,
+        params: CreateItem<'_>,
     ) -> RazorpayResult<Item> {
         let res = razorpay
             .api
             .post(RequestParams {
                 url: "/items".to_owned(),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -93,13 +95,10 @@ impl Item {
         }
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        item_id: T,
-    ) -> RazorpayResult<Item>
-    where
-        T: Display,
-    {
+        item_id: &ItemId,
+    ) -> RazorpayResult<Item> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -115,16 +114,19 @@ impl Item {
         }
     }
 
-    pub async fn all(
+    pub async fn list<T>(
         razorpay: &Razorpay,
-        data: AllItems,
-    ) -> RazorpayResult<Collection<Item>> {
+        params: T,
+    ) -> RazorpayResult<Collection<Item>>
+    where
+        T: Into<Option<ListItems>>,
+    {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/items".to_owned(),
                 version: None,
-                data: Some(data),
+                data: params.into(),
             })
             .await?;
 
@@ -134,20 +136,17 @@ impl Item {
         }
     }
 
-    pub async fn update<T>(
+    pub async fn update(
         razorpay: &Razorpay,
-        item_id: T,
-        data: UpdateItem,
-    ) -> RazorpayResult<Item>
-    where
-        T: Display,
-    {
+        item_id: &ItemId,
+        params: UpdateItem<'_>,
+    ) -> RazorpayResult<Item> {
         let res = razorpay
             .api
             .patch(RequestParams {
                 url: format!("/items/{}", item_id),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -157,14 +156,11 @@ impl Item {
         }
     }
 
-    pub async fn delete<T>(
+    pub async fn delete(
         razorpay: &Razorpay,
-        item_id: T,
-    ) -> RazorpayResult<()>
-    where
-        T: Display,
-    {
-        let res: InternalApiResult<[u8; 0]> = razorpay
+        item_id: &ItemId,
+    ) -> RazorpayResult<()> {
+        let res: InternalApiResult<Value> = razorpay
             .api
             .delete(RequestParams {
                 url: format!("/items/{}", item_id),

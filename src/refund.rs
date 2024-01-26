@@ -1,17 +1,17 @@
-use std::fmt::Display;
-
 use crate::{
     api::RequestParams,
     common::{Collection, Currency, Filter, Object},
+    entity::RefundEntity,
     error::{InternalApiResult, RazorpayResult},
+    ids::RefundId,
     util::deserialize_notes,
-    Razorpay,
+    BatchId, PaymentId, Razorpay,
 };
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum RefundSpeed {
     #[default]
@@ -19,7 +19,7 @@ pub enum RefundSpeed {
     Optimum,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum RefundStatus {
     Pending,
@@ -27,17 +27,17 @@ pub enum RefundStatus {
     Failed,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Refund {
-    pub id: String,
-    pub entity: String,
+    pub id: RefundId,
+    pub entity: RefundEntity,
     pub amount: u64,
     pub currency: Currency,
-    pub payment_id: String,
+    pub payment_id: PaymentId,
     pub speed: RefundSpeed,
     #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
-    pub batch_id: Option<String>,
+    pub batch_id: Option<BatchId>,
     #[serde(deserialize_with = "deserialize_notes")]
     pub notes: Object,
     pub receipt: Option<String>,
@@ -57,8 +57,8 @@ pub struct Refund {
     pub speed_processed: Option<RefundSpeed>,
 }
 
-#[derive(Debug, Serialize, Default)]
-pub struct CreateRefund {
+#[derive(Debug, Serialize, Default, Clone, PartialEq, Eq)]
+pub struct CreateRefund<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -66,13 +66,13 @@ pub struct CreateRefund {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<Object>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub receipt: Option<String>,
+    pub receipt: Option<&'a str>,
 }
 
 impl Refund {
-    pub async fn all<T>(
+    pub async fn list<T>(
         razorpay: &Razorpay,
-        data: T,
+        params: T,
     ) -> RazorpayResult<Collection<Refund>>
     where
         T: Into<Option<Filter>>,
@@ -82,7 +82,7 @@ impl Refund {
             .get(RequestParams {
                 url: "/refunds".to_owned(),
                 version: None,
-                data: data.into(),
+                data: params.into(),
             })
             .await?;
 
@@ -92,13 +92,10 @@ impl Refund {
         }
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        refund_id: T,
-    ) -> RazorpayResult<Refund>
-    where
-        T: Display,
-    {
+        refund_id: &RefundId,
+    ) -> RazorpayResult<Refund> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -114,14 +111,11 @@ impl Refund {
         }
     }
 
-    pub async fn update<T>(
+    pub async fn update(
         razorpay: &Razorpay,
-        refund_id: T,
+        refund_id: &RefundId,
         notes: Object,
-    ) -> RazorpayResult<Refund>
-    where
-        T: Display,
-    {
+    ) -> RazorpayResult<Refund> {
         let res = razorpay
             .api
             .patch(RequestParams {

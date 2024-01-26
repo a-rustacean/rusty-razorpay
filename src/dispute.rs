@@ -1,17 +1,18 @@
 use crate::{
     api::RequestParams,
     common::{Collection, Currency},
+    entity::DisputeEntity,
     error::{InternalApiResult, RazorpayResult},
-    Razorpay,
+    ids::DisputeId,
+    PaymentId, Razorpay,
 };
 use chrono::{
     serde::{ts_seconds, ts_seconds_option},
     DateTime, Utc,
 };
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum DisputeStatus {
     Open,
@@ -21,7 +22,7 @@ pub enum DisputeStatus {
     Closed,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum DisputePhase {
     Fraud,
@@ -31,13 +32,14 @@ pub enum DisputePhase {
     Arbitration,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct OtherDisputeEvidence {
-    pub r#type: String,
+    #[serde(rename = "type")]
+    pub type_: String,
     pub document_ids: Vec<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct DisputeEvidence {
     pub amount: u64,
     pub summary: String,
@@ -56,11 +58,11 @@ pub struct DisputeEvidence {
     pub submitted_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Dispute {
-    pub id: String,
-    pub entity: String,
-    pub payment_id: String,
+    pub id: DisputeId,
+    pub entity: DisputeEntity,
+    pub payment_id: PaymentId,
     pub amount: u64,
     pub currency: Currency,
     pub amount_deducted: u64,
@@ -75,7 +77,7 @@ pub struct Dispute {
     pub evidence: DisputeEvidence,
 }
 
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum ContestDisputeAction {
     Draft,
@@ -83,26 +85,33 @@ pub enum ContestDisputeAction {
     Submit,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct ContestDispute {
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct ContestDiputeOtherEvidence<'a> {
+    #[serde(rename = "type")]
+    pub type_: &'a str,
+    pub document_ids: &'a [&'a str],
+}
+
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct ContestDispute<'a> {
     pub amount: u64,
-    pub summary: String,
-    pub shipping_proof: Option<Vec<String>>,
-    pub billing_proof: Option<Vec<String>>,
-    pub cancellation_proof: Option<Vec<String>>,
-    pub cutomer_communication: Option<Vec<String>>,
-    pub proof_of_service: Option<Vec<String>>,
-    pub explanation_letter: Option<Vec<String>>,
-    pub refund_confirmation: Option<Vec<String>>,
-    pub access_activity_log: Option<Vec<String>>,
-    pub refund_cancellation_policy: Option<Vec<String>>,
-    pub term_and_conditions: Option<Vec<String>>,
-    pub others: Option<Vec<OtherDisputeEvidence>>,
+    pub summary: &'a str,
+    pub shipping_proof: Option<&'a [&'a str]>,
+    pub billing_proof: Option<&'a [&'a str]>,
+    pub cancellation_proof: Option<&'a [&'a str]>,
+    pub cutomer_communication: Option<&'a [&'a str]>,
+    pub proof_of_service: Option<&'a [&'a str]>,
+    pub explanation_letter: Option<&'a [&'a str]>,
+    pub refund_confirmation: Option<&'a [&'a str]>,
+    pub access_activity_log: Option<&'a [&'a str]>,
+    pub refund_cancellation_policy: Option<&'a [&'a str]>,
+    pub term_and_conditions: Option<&'a [&'a str]>,
+    pub others: Option<&'a [ContestDiputeOtherEvidence<'a>]>,
     pub action: ContestDisputeAction,
 }
 
 impl Dispute {
-    pub async fn all(
+    pub async fn list(
         razorpay: &Razorpay,
     ) -> RazorpayResult<Collection<Dispute>> {
         let res = razorpay
@@ -120,13 +129,10 @@ impl Dispute {
         }
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        dispute_id: T,
-    ) -> RazorpayResult<Dispute>
-    where
-        T: Display,
-    {
+        dispute_id: &DisputeId,
+    ) -> RazorpayResult<Dispute> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -142,13 +148,10 @@ impl Dispute {
         }
     }
 
-    pub async fn accept<T>(
+    pub async fn accept(
         razorpay: &Razorpay,
-        dispute_id: T,
-    ) -> RazorpayResult<Dispute>
-    where
-        T: Display,
-    {
+        dispute_id: &DisputeId,
+    ) -> RazorpayResult<Dispute> {
         let res = razorpay
             .api
             .post(RequestParams {
@@ -164,20 +167,17 @@ impl Dispute {
         }
     }
 
-    pub async fn contest<T>(
+    pub async fn contest(
         razorpay: &Razorpay,
-        dispute_id: T,
-        data: ContestDispute,
-    ) -> RazorpayResult<Dispute>
-    where
-        T: Display,
-    {
+        dispute_id: &DisputeId,
+        params: ContestDispute<'_>,
+    ) -> RazorpayResult<Dispute> {
         let res = razorpay
             .api
             .patch(RequestParams {
                 url: format!("/disputes/{}/contest", dispute_id),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 

@@ -2,10 +2,16 @@ use crate::{
     api::RequestParams,
     card::{CardNetwork, CardType},
     common::{Collection, Currency, Filter, Object},
+    entity::{
+        InstantSettlementEntity, InstantSettlementPayoutEntity,
+        SettlementEntity,
+    },
     error::{InternalApiResult, RazorpayResult},
+    ids::{InstantSettlementId, InstantSettlementPayoutId, SettlementId},
     payment::PaymentMethod,
     util::deserialize_notes,
-    Razorpay,
+    AdjustmentId, DisputeId, OrderId, PaymentId, Razorpay, RefundId,
+    TransferId,
 };
 use chrono::{
     serde::{ts_seconds, ts_seconds_option},
@@ -13,9 +19,8 @@ use chrono::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::fmt::Display;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum SettlementStatus {
     Created,
@@ -23,10 +28,10 @@ pub enum SettlementStatus {
     Failed,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Settlement {
-    pub id: String,
-    pub entity: String,
+    pub id: SettlementId,
+    pub entity: SettlementEntity,
     pub amount: u64,
     pub status: SettlementStatus,
     pub fees: u64,
@@ -36,7 +41,7 @@ pub struct Settlement {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum InstantSettlementStatus {
     Created,
@@ -46,19 +51,19 @@ pub enum InstantSettlementStatus {
     Reversed,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
-pub enum OndemandPayoutStatus {
+pub enum InstantSettlementPayoutStatus {
     Created,
     Initiated,
     Processed,
     Reversed,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct OndemandPayout {
-    pub id: String,
-    pub entity: String,
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+pub struct InstantSettlementPayout {
+    pub id: InstantSettlementPayoutId,
+    pub entity: InstantSettlementPayoutEntity,
     #[serde(with = "ts_seconds")]
     pub initiated_at: DateTime<Utc>,
     #[serde(with = "ts_seconds_option")]
@@ -70,15 +75,15 @@ pub struct OndemandPayout {
     pub fees: u64,
     pub tax: u64,
     pub utr: String,
-    pub status: OndemandPayoutStatus,
+    pub status: InstantSettlementPayoutStatus,
     #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct InstantSettlement {
-    pub id: String,
-    pub entity: String,
+    pub id: InstantSettlementId,
+    pub entity: InstantSettlementEntity,
     pub amount_requested: u64,
     pub amount_settled: u64,
     pub amount_pending: u64,
@@ -93,22 +98,32 @@ pub struct InstantSettlement {
     pub notes: Object,
     #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
-    pub ondemand_payouts: Option<Collection<OndemandPayout>>,
+    pub ondemand_payouts: Option<Collection<InstantSettlementPayout>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
-pub enum EntityType {
+pub enum SettlementType {
     Payment,
     Refund,
     Transfer,
     Adjustment,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum SettlementReconEntityId {
+    Payment(PaymentId),
+    Refund(RefundId),
+    Transfer(TransferId),
+    Adjustment(AdjustmentId),
+}
+
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct SettlementRecon {
-    pub entity_id: String,
-    pub r#type: EntityType,
+    pub entity_id: SettlementReconEntityId,
+    #[serde(rename = "type")]
+    pub type_: SettlementType,
     pub debit: u64,
     pub credit: u64,
     pub amount: u64,
@@ -121,7 +136,7 @@ pub struct SettlementRecon {
     pub created_at: DateTime<Utc>,
     #[serde(with = "ts_seconds_option")]
     pub settled_at: Option<DateTime<Utc>>,
-    pub settlement_id: Option<String>,
+    pub settlement_id: Option<SettlementId>,
     pub description: Option<String>,
     #[serde(deserialize_with = "deserialize_notes")]
     pub notes: Object,
@@ -139,18 +154,18 @@ pub struct SettlementRecon {
     // the place instead, haven't tested it yet
     //
     // [docs]: https://razorpay.com/docs/api/settlements/fetch-recon/
-    pub payment_id: Option<String>,
+    pub payment_id: Option<PaymentId>,
     pub settlement_utr: Option<String>,
-    pub order_id: Option<String>,
+    pub order_id: Option<OrderId>,
     pub order_receipt: Option<String>,
     pub method: Option<PaymentMethod>,
     pub card_network: Option<CardNetwork>,
     pub card_issuer: Option<String>,
     pub card_type: Option<CardType>,
-    pub dispute_id: Option<String>,
+    pub dispute_id: Option<DisputeId>,
 }
 
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
 pub struct FetchRecon {
     pub year: u16,
     pub month: u8,
@@ -162,18 +177,18 @@ pub struct FetchRecon {
     pub skip: Option<u64>,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct CreateInstantSettlement {
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateInstantSettlement<'a> {
     pub amount: u64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub settle_full_balance: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
+    pub description: Option<&'a str>,
     pub notes: Object,
 }
 
 impl Settlement {
-    pub async fn all<T>(
+    pub async fn list<T>(
         razorpay: &Razorpay,
         data: T,
     ) -> RazorpayResult<Collection<Settlement>>
@@ -195,13 +210,10 @@ impl Settlement {
         }
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        settlement_id: T,
-    ) -> RazorpayResult<Settlement>
-    where
-        T: Display,
-    {
+        settlement_id: &SettlementId,
+    ) -> RazorpayResult<Settlement> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -216,17 +228,19 @@ impl Settlement {
             InternalApiResult::Err { error } => Err(error.into()),
         }
     }
+}
 
-    pub async fn fetch_recon(
+impl SettlementRecon {
+    pub async fn fetch(
         razorpay: &Razorpay,
-        data: FetchRecon,
+        params: FetchRecon,
     ) -> RazorpayResult<SettlementRecon> {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/settlements/recon/combined".to_owned(),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -235,17 +249,19 @@ impl Settlement {
             InternalApiResult::Err { error } => Err(error.into()),
         }
     }
+}
 
-    pub async fn create_instant(
+impl InstantSettlement {
+    pub async fn create(
         razorpay: &Razorpay,
-        data: CreateInstantSettlement,
+        params: CreateInstantSettlement<'_>,
     ) -> RazorpayResult<InstantSettlement> {
         let res = razorpay
             .api
             .post(RequestParams {
                 url: "/settlements/ondemand".to_owned(),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -255,7 +271,7 @@ impl Settlement {
         }
     }
 
-    pub async fn all_instant(
+    pub async fn list(
         razorpay: &Razorpay,
         expand_payout: bool,
     ) -> RazorpayResult<Collection<InstantSettlement>> {
@@ -276,18 +292,15 @@ impl Settlement {
         }
     }
 
-    pub async fn fetch_instant<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        settlement_id: T,
+        instant_settlement_id: &InstantSettlementId,
         expand_payout: bool,
-    ) -> RazorpayResult<InstantSettlement>
-    where
-        T: Display,
-    {
+    ) -> RazorpayResult<InstantSettlement> {
         let res = razorpay
             .api
             .get(RequestParams {
-                url: format!("/settlements/ondemand/{}", settlement_id),
+                url: format!("/settlements/ondemand/{}", instant_settlement_id),
                 version: None,
                 data: expand_payout.then_some(json!({
                     "expand[]": "ondemand_payouts",

@@ -5,7 +5,7 @@ use crate::{
 use serde::Deserialize;
 use std::{error::Error, fmt::Display};
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize)]
 pub struct ApiError {
     pub code: String,
     pub description: String,
@@ -72,7 +72,7 @@ impl Error for RazorpayError {}
 
 pub type RazorpayResult<T> = Result<T, RazorpayError>;
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize)]
 #[serde(untagged)]
 pub(crate) enum InternalApiResult<T> {
     Ok(T),

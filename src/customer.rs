@@ -1,18 +1,17 @@
-use std::fmt::Display;
-
 use crate::{
     api::RequestParams,
     common::{Collection, Object},
     error::{InternalApiResult, RazorpayResult},
+    ids::CustomerId,
     util::{deserialize_notes, serialize_bool_as_int_option},
     Razorpay,
 };
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct Customer {
-    pub id: String,
+    pub id: CustomerId,
     pub name: String,
     pub contact: Option<String>,
     pub email: Option<String>,
@@ -23,36 +22,36 @@ pub struct Customer {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct CreateCustomer {
-    pub name: String,
+#[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
+pub struct CreateCustomer<'a> {
+    pub name: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact: Option<String>,
+    pub contact: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
+    pub email: Option<&'a str>,
     #[serde(
         serialize_with = "serialize_bool_as_int_option",
         skip_serializing_if = "Option::is_none"
     )]
     pub fail_existing: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub gstin: Option<String>,
+    pub gstin: Option<&'a str>,
     #[serde(skip_serializing_if = "Object::is_empty")]
     pub notes: Object,
 }
 
-#[derive(Debug, Serialize)]
-pub struct UpdateCustomer {
+#[derive(Debug, Serialize, Clone, Eq, PartialEq)]
+pub struct UpdateCustomer<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
+    pub name: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
+    pub email: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact: Option<String>,
+    pub contact: Option<&'a str>,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct AllCustomers {
+#[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
+pub struct ListCustomers {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub count: Option<u8>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -62,14 +61,14 @@ pub struct AllCustomers {
 impl Customer {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreateCustomer,
+        params: CreateCustomer<'_>,
     ) -> RazorpayResult<Customer> {
         let res = razorpay
             .api
             .post(RequestParams {
                 url: "/customers".to_owned(),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -79,20 +78,17 @@ impl Customer {
         }
     }
 
-    pub async fn update<T>(
+    pub async fn update(
         razorpay: &Razorpay,
-        customer_id: T,
-        data: UpdateCustomer,
-    ) -> RazorpayResult<Customer>
-    where
-        T: Display,
-    {
+        customer_id: &CustomerId,
+        params: UpdateCustomer<'_>,
+    ) -> RazorpayResult<Customer> {
         let res = razorpay
             .api
             .put(RequestParams {
                 url: format!("/customers/{}", customer_id),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -102,16 +98,19 @@ impl Customer {
         }
     }
 
-    pub async fn all(
+    pub async fn list<T>(
         razorpay: &Razorpay,
-        data: AllCustomers,
-    ) -> RazorpayResult<Collection<Customer>> {
+        params: T,
+    ) -> RazorpayResult<Collection<Customer>>
+    where
+        T: Into<Option<ListCustomers>>,
+    {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/customers".to_owned(),
                 version: None,
-                data: Some(data),
+                data: params.into(),
             })
             .await?;
 
@@ -121,13 +120,10 @@ impl Customer {
         }
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        customer_id: T,
-    ) -> RazorpayResult<Customer>
-    where
-        T: Display,
-    {
+        customer_id: &CustomerId,
+    ) -> RazorpayResult<Customer> {
         let res = razorpay
             .api
             .get(RequestParams {

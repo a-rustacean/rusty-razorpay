@@ -1,21 +1,20 @@
-use std::fmt::Display;
-
+use crate::{
+    api::RequestParams,
+    entity::DocumentEntity,
+    error::{InternalApiResult, RazorpayResult},
+    ids::DocumentId,
+    Razorpay,
+};
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::Deserialize;
 
-use crate::{
-    api::RequestParams,
-    error::{InternalApiResult, RazorpayResult},
-    Razorpay,
-};
-
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentPurpose {
     DisputeEvidence,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub enum DocumentMimeType {
     #[serde(rename = "image/jpg")]
     ImageJpg,
@@ -27,10 +26,10 @@ pub enum DocumentMimeType {
     ApplicationPdf,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct Document {
-    pub id: String,
-    pub entity: String,
+    pub id: DocumentId,
+    pub entity: DocumentEntity,
     pub purpose: DocumentPurpose,
     pub name: String,
     pub size: u64,
@@ -47,13 +46,10 @@ impl Document {
     //
     // [docs]: https://razorpay.com/docs/api/documents/create
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        document_id: T,
-    ) -> RazorpayResult<Document>
-    where
-        T: Display,
-    {
+        document_id: &DocumentId,
+    ) -> RazorpayResult<Document> {
         let res = razorpay
             .api
             .get(RequestParams {

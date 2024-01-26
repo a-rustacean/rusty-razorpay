@@ -2,7 +2,11 @@ use chrono::{serde::ts_seconds_option, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+use crate::entity::CollectionEntity;
+
+#[derive(
+    Debug, Serialize, Deserialize, Default, Clone, Copy, PartialEq, Eq,
+)]
 pub enum Currency {
     AED,
     ALL,
@@ -102,14 +106,14 @@ pub enum Currency {
 
 pub type Object = HashMap<String, String>;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Collection<T> {
-    pub entity: String,
+    pub entity: CollectionEntity,
     pub count: usize,
     pub items: Vec<T>,
 }
 
-#[derive(Debug, Serialize, Default)]
+#[derive(Debug, Serialize, Default, Clone, PartialEq, Eq)]
 pub struct Filter {
     #[serde(
         skip_serializing_if = "Option::is_none",
@@ -127,7 +131,9 @@ pub struct Filter {
     pub skip: Option<usize>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(
+    Debug, Default, Serialize, Deserialize, Clone, Copy, PartialEq, Eq,
+)]
 pub enum Country {
     #[serde(alias = "bangladesh")]
     BD,

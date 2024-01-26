@@ -2,7 +2,9 @@ use crate::{
     api::RequestParams,
     card::{Card, CardType},
     common::{Collection, Currency, Filter, Object},
+    entity::{DowntimeEntity, PaymentEntity},
     error::{InternalApiResult, RazorpayResult},
+    ids::{CardId, DowntimeId, OrderId, PaymentId, RefundId},
     offer::Offer,
     refund::{CreateRefund, Refund},
     util::deserialize_notes,
@@ -14,9 +16,8 @@ use chrono::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::fmt::Display;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum PaymentStatus {
     Created,
@@ -26,7 +27,7 @@ pub enum PaymentStatus {
     Failed,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum PaymentMethod {
     Card,
@@ -36,21 +37,21 @@ pub enum PaymentMethod {
     Upi,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum PaymentRefundStatus {
     Partial,
     Full,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct PaymentAcquirerData {
     pub rrn: String,
     pub authentication_reference_number: Option<String>,
     pub bank_transaction_id: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum PaymentAccountType {
     BankAccount,
@@ -58,49 +59,49 @@ pub enum PaymentAccountType {
     Wallet,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum PaymentUpiFlow {
     InApp,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct PaymentUpiInfo {
     pub payer_account_type: PaymentAccountType,
     pub vpa: String,
     pub flow: Option<PaymentUpiFlow>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct PaymentEmiInfo {
     pub issuer: String,
     pub rate: u16,
     pub duration: u64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct Payment {
-    pub id: String,
-    pub entity: String,
+    pub id: PaymentId,
+    pub entity: PaymentEntity,
     pub amount: u64,
     pub currency: Currency,
     pub status: PaymentStatus,
     pub method: PaymentMethod,
-    pub order_id: String,
+    pub order_id: OrderId,
     pub description: Option<String>,
     pub international: bool,
     pub refund_status: Option<PaymentRefundStatus>,
     pub amount_refunded: u64,
     pub captured: bool,
     pub email: String,
-    pub contact: String,
+    pub contact: Option<String>,
     pub fee: u64,
     pub tax: u64,
     #[serde(deserialize_with = "deserialize_notes")]
     pub notes: Object,
     #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
-    pub card_id: Option<String>,
+    pub card_id: Option<CardId>,
     pub card: Option<Card>,
     pub wallet: Option<String>,
     pub acquirer_data: Option<PaymentAcquirerData>,
@@ -115,13 +116,13 @@ pub struct Payment {
     pub error_reason: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone, Eq, PartialEq)]
 pub struct CapturePayment {
     pub amount: u64,
     pub currency: Currency,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum PaymentExpand {
     Card,
@@ -130,22 +131,22 @@ pub enum PaymentExpand {
     Upi,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
-pub enum AllPaymentsExpand {
+pub enum ListPaymentsExpand {
     Card,
     Emi,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct AllPayments {
+#[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
+pub struct ListPayments<'a> {
     #[serde(rename = "expand[]")]
-    pub expand: Vec<AllPaymentsExpand>,
+    pub expand: &'a [ListPaymentsExpand],
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub filter: Option<Filter>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum DowntimeMethod {
     Card,
@@ -153,7 +154,7 @@ pub enum DowntimeMethod {
     Netbanking,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum DowntimeStatus {
     Scheduled,
@@ -162,7 +163,7 @@ pub enum DowntimeStatus {
     Cancelled,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum DowntimeSeverity {
     High,
@@ -170,7 +171,7 @@ pub enum DowntimeSeverity {
     Low,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub enum DowntimeInstrumentBank {
     HDFC,
     ICIC,
@@ -180,7 +181,7 @@ pub enum DowntimeInstrumentBank {
     PUNB,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub enum DowntimeInstrumentNetwork {
     AMEX,
     DICL,
@@ -190,7 +191,7 @@ pub enum DowntimeInstrumentNetwork {
     ALL,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub enum DowntimeInstrumentIssuer {
     SBIN,
     HDFC,
@@ -206,7 +207,7 @@ pub enum DowntimeInstrumentIssuer {
     UBIN,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum DowntimeInstrumentPsp {
     GooglePay,
@@ -215,7 +216,7 @@ pub enum DowntimeInstrumentPsp {
     Bhim,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct DowntimeInstruments {
     pub bank: Option<DowntimeInstrumentBank>,
     pub network: Option<DowntimeInstrumentNetwork>,
@@ -225,7 +226,7 @@ pub struct DowntimeInstruments {
     pub card_type: Option<CardType>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum DowntimeFlow {
     Collect,
@@ -233,10 +234,10 @@ pub enum DowntimeFlow {
     InApp,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct Downtime {
-    pub id: String,
-    pub entity: String,
+    pub id: DowntimeId,
+    pub entity: DowntimeEntity,
     pub method: DowntimeMethod,
     #[serde(with = "ts_seconds")]
     pub begin: DateTime<Utc>,
@@ -254,20 +255,17 @@ pub struct Downtime {
 }
 
 impl Payment {
-    pub async fn capture<T>(
+    pub async fn capture(
         razorpay: &Razorpay,
-        payment_id: T,
-        data: CapturePayment,
-    ) -> RazorpayResult<Payment>
-    where
-        T: Display,
-    {
+        payment_id: &PaymentId,
+        params: CapturePayment,
+    ) -> RazorpayResult<Payment> {
         let res = razorpay
             .api
             .post(RequestParams {
                 url: format!("/payments/{}/capture", payment_id),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -277,14 +275,11 @@ impl Payment {
         }
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        payment_id: T,
-        expand: Vec<PaymentExpand>,
-    ) -> RazorpayResult<Payment>
-    where
-        T: Display,
-    {
+        payment_id: &PaymentId,
+        expand: &[PaymentExpand],
+    ) -> RazorpayResult<Payment> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -302,16 +297,19 @@ impl Payment {
         }
     }
 
-    pub async fn all(
+    pub async fn list<T>(
         razorpay: &Razorpay,
-        data: AllPayments,
-    ) -> RazorpayResult<Collection<Payment>> {
+        params: T,
+    ) -> RazorpayResult<Collection<Payment>>
+    where
+        T: for<'a> Into<Option<ListPayments<'a>>>,
+    {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/payments".to_owned(),
                 version: None,
-                data: Some(data),
+                data: params.into(),
             })
             .await?;
 
@@ -321,13 +319,10 @@ impl Payment {
         }
     }
 
-    pub async fn fetch_card<T>(
+    pub async fn fetch_card(
         razorpay: &Razorpay,
-        payment_id: T,
-    ) -> RazorpayResult<Card>
-    where
-        T: Display,
-    {
+        payment_id: &PaymentId,
+    ) -> RazorpayResult<Card> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -343,21 +338,18 @@ impl Payment {
         }
     }
 
-    pub async fn update<T>(
+    pub async fn update(
         razorpay: &Razorpay,
-        payment_id: T,
-        data: Object,
-    ) -> RazorpayResult<Payment>
-    where
-        T: Display,
-    {
+        payment_id: &PaymentId,
+        notes: Object,
+    ) -> RazorpayResult<Payment> {
         let res = razorpay
             .api
             .patch(RequestParams {
                 url: format!("/payments/{}", payment_id),
                 version: None,
                 data: Some(json!({
-                    "notes": data,
+                    "notes": notes,
                 })),
             })
             .await?;
@@ -368,7 +360,72 @@ impl Payment {
         }
     }
 
-    pub async fn all_downtimes(
+    pub async fn refund(
+        razorpay: &Razorpay,
+        payment_id: &PaymentId,
+        params: CreateRefund<'_>,
+    ) -> RazorpayResult<Refund> {
+        let res = razorpay
+            .api
+            .post(RequestParams {
+                url: format!("/payments/{}/refund", payment_id),
+                version: None,
+                data: Some(params),
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(refund) => Ok(refund),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn list_refunds<T>(
+        razorpay: &Razorpay,
+        payment_id: &PaymentId,
+        params: T,
+    ) -> RazorpayResult<Collection<Refund>>
+    where
+        T: Into<Option<Filter>>,
+    {
+        let res = razorpay
+            .api
+            .get(RequestParams {
+                url: format!("/payments/{}/refunds", payment_id),
+                version: None,
+                data: params.into(),
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(refunds) => Ok(refunds),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn fetch_refund(
+        razorpay: &Razorpay,
+        payment_id: &PaymentId,
+        refund_id: &RefundId,
+    ) -> RazorpayResult<Refund> {
+        let res = razorpay
+            .api
+            .get(RequestParams {
+                url: format!("/payments/{}/refunds{}", payment_id, refund_id),
+                version: None,
+                data: None::<()>,
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(refund) => Ok(refund),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+}
+
+impl Downtime {
+    pub async fn list(
         razorpay: &Razorpay,
     ) -> RazorpayResult<Collection<Downtime>> {
         let res = razorpay
@@ -386,13 +443,10 @@ impl Payment {
         }
     }
 
-    pub async fn fetch_downtime<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        downtime_id: T,
-    ) -> RazorpayResult<Downtime>
-    where
-        T: Display,
-    {
+        downtime_id: &DowntimeId,
+    ) -> RazorpayResult<Downtime> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -404,76 +458,6 @@ impl Payment {
 
         match res {
             InternalApiResult::Ok(downtime) => Ok(downtime),
-            InternalApiResult::Err { error } => Err(error.into()),
-        }
-    }
-
-    pub async fn refund<T>(
-        razorpay: &Razorpay,
-        payment_id: T,
-        data: CreateRefund,
-    ) -> RazorpayResult<Refund>
-    where
-        T: Display,
-    {
-        let res = razorpay
-            .api
-            .post(RequestParams {
-                url: format!("/payments/{}/refund", payment_id),
-                version: None,
-                data: Some(data),
-            })
-            .await?;
-
-        match res {
-            InternalApiResult::Ok(refund) => Ok(refund),
-            InternalApiResult::Err { error } => Err(error.into()),
-        }
-    }
-
-    pub async fn all_refunds<T>(
-        razorpay: &Razorpay,
-        payment_id: T,
-        data: Filter,
-    ) -> RazorpayResult<Collection<Refund>>
-    where
-        T: Display,
-    {
-        let res = razorpay
-            .api
-            .get(RequestParams {
-                url: format!("/payments/{}/refunds", payment_id),
-                version: None,
-                data: Some(data),
-            })
-            .await?;
-
-        match res {
-            InternalApiResult::Ok(refunds) => Ok(refunds),
-            InternalApiResult::Err { error } => Err(error.into()),
-        }
-    }
-
-    pub async fn fetch_refund<T, U>(
-        razorpay: &Razorpay,
-        payment_id: T,
-        refund_id: U,
-    ) -> RazorpayResult<Refund>
-    where
-        T: Display,
-        U: Display,
-    {
-        let res = razorpay
-            .api
-            .get(RequestParams {
-                url: format!("/payments/{}/refunds{}", payment_id, refund_id),
-                version: None,
-                data: None::<()>,
-            })
-            .await?;
-
-        match res {
-            InternalApiResult::Ok(refund) => Ok(refund),
             InternalApiResult::Err { error } => Err(error.into()),
         }
     }

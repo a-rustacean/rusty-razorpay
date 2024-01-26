@@ -1,35 +1,36 @@
 use crate::{
     api::RequestParams,
     common::{Collection, Currency, Filter, Object},
+    entity::OrderEntity,
     error::{InternalApiResult, RazorpayResult},
+    ids::OrderId,
     payment::Payment,
     util::{deserialize_notes, serialize_bool_as_int_option},
-    Razorpay,
+    OfferId, Razorpay,
 };
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::fmt::Display;
 
-#[derive(Debug, Serialize)]
-pub struct OrderBankAccount {
-    pub account_number: String,
-    pub name: String,
-    pub ifsc: String,
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct OrderBankAccount<'a> {
+    pub account_number: &'a str,
+    pub name: &'a str,
+    pub ifsc: &'a str,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct CreateOrder {
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateOrder<'a> {
     pub amount: u64,
     pub currency: Currency,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub receipt: Option<String>,
+    pub receipt: Option<&'a str>,
     #[serde(skip_serializing_if = "Object::is_empty")]
     pub notes: Object,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub partial_payment: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub bank_account: Option<OrderBankAccount>,
+    pub bank_account: Option<OrderBankAccount<'a>>,
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq, Eq)]
@@ -41,8 +42,8 @@ pub enum OrderExpand {
     VirtualAccount,
 }
 
-#[derive(Debug, Serialize, Default)]
-pub struct AllOrders {
+#[derive(Debug, Serialize, Default, Clone, PartialEq, Eq)]
+pub struct ListOrders<'a> {
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub filter: Option<Filter>,
     #[serde(
@@ -51,12 +52,12 @@ pub struct AllOrders {
     )]
     pub authorized: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub receipt: Option<String>,
+    pub receipt: Option<&'a str>,
     #[serde(rename = "expand[]")]
-    pub expand: Vec<OrderExpand>,
+    pub expand: &'a [OrderExpand],
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum OrderStatus {
     Created,
@@ -64,17 +65,17 @@ pub enum OrderStatus {
     Paid,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Order {
-    pub id: String,
-    pub entity: String,
+    pub id: OrderId,
+    pub entity: OrderEntity,
     pub amount: u64,
     pub partial_payment: Option<bool>,
     pub amount_paid: u64,
     pub amount_due: u64,
     pub currency: Currency,
     pub receipt: Option<String>,
-    pub offer_id: Option<String>,
+    pub offer_id: Option<OfferId>,
     pub payments: Option<Collection<Payment>>,
     pub status: OrderStatus,
     #[serde(deserialize_with = "deserialize_notes")]
@@ -87,14 +88,14 @@ pub struct Order {
 impl Order {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreateOrder,
+        params: CreateOrder<'_>,
     ) -> RazorpayResult<Order> {
         let res = razorpay
             .api
             .post(RequestParams {
                 url: "/orders".to_owned(),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -104,16 +105,19 @@ impl Order {
         }
     }
 
-    pub async fn all(
+    pub async fn list<T>(
         razorpay: &Razorpay,
-        data: AllOrders,
-    ) -> RazorpayResult<Collection<Order>> {
+        params: T,
+    ) -> RazorpayResult<Collection<Order>>
+    where
+        T: for<'a> Into<Option<ListOrders<'a>>>,
+    {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/orders".to_owned(),
                 version: None,
-                data: Some(data),
+                data: params.into(),
             })
             .await?;
 
@@ -123,13 +127,10 @@ impl Order {
         }
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        order_id: T,
-    ) -> RazorpayResult<Order>
-    where
-        T: Display,
-    {
+        order_id: &OrderId,
+    ) -> RazorpayResult<Order> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -145,13 +146,10 @@ impl Order {
         }
     }
 
-    pub async fn fetch_payments<T>(
+    pub async fn list_payments(
         razorpay: &Razorpay,
-        order_id: T,
-    ) -> RazorpayResult<Collection<Payment>>
-    where
-        T: Display,
-    {
+        order_id: &OrderId,
+    ) -> RazorpayResult<Collection<Payment>> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -167,14 +165,11 @@ impl Order {
         }
     }
 
-    pub async fn update<T>(
+    pub async fn update(
         razorpay: &Razorpay,
-        order_id: T,
+        order_id: &OrderId,
         notes: Object,
-    ) -> RazorpayResult<Order>
-    where
-        T: Display,
-    {
+    ) -> RazorpayResult<Order> {
         let res = razorpay
             .api
             .patch(RequestParams {

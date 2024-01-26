@@ -2,7 +2,9 @@ use crate::{
     addon::Addon,
     api::RequestParams,
     common::{Collection, Currency, Filter, Object},
+    entity::SubscriptionEntity,
     error::{InternalApiResult, RazorpayResult},
+    ids::{CustomerId, OfferId, PlanId, SubscriptionId},
     util::{deserialize_notes, serialize_bool_as_int_option},
     Razorpay,
 };
@@ -12,29 +14,28 @@ use chrono::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::fmt::Display;
 
-#[derive(Debug, Default, Serialize)]
-pub struct CreateSubscriptionAddonItem {
-    pub name: String,
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateSubscriptionAddonItem<'a> {
+    pub name: &'a str,
     pub amount: u64,
     pub currency: Currency,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct CreateSubscriptionAddon {
-    pub item: CreateSubscriptionAddonItem,
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateSubscriptionAddon<'a> {
+    pub item: CreateSubscriptionAddonItem<'a>,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct CreateSubscriptionNotifyInfo {
-    pub notify_email: String,
-    pub notify_phone: String,
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateSubscriptionNotifyInfo<'a> {
+    pub notify_email: &'a str,
+    pub notify_phone: &'a str,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct CreateSubscription {
-    pub plan_id: String,
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateSubscription<'a> {
+    pub plan_id: &'a PlanId,
     pub total_count: u64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quantity: Option<u64>,
@@ -53,29 +54,29 @@ pub struct CreateSubscription {
         serialize_with = "serialize_bool_as_int_option"
     )]
     pub customer_notify: Option<bool>,
-    pub addons: Vec<CreateSubscriptionAddon>,
+    pub addons: &'a [CreateSubscriptionAddon<'a>],
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub offer_id: Option<String>,
+    pub offer_id: Option<&'a OfferId>,
     #[serde(skip_serializing_if = "Object::is_empty")]
     pub notes: Object,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub notify_info: Option<CreateSubscriptionNotifyInfo>,
+    pub notify_info: Option<CreateSubscriptionNotifyInfo<'a>>,
 }
 
-#[derive(Debug, Default, Serialize)]
-pub struct AllSubscriptions {
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct ListSubscriptions<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub plan_id: Option<String>,
+    pub plan_id: Option<&'a str>,
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub filter: Option<Filter>,
 }
 
-#[derive(Debug, Serialize)]
-pub struct UpdateSubscription {
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct UpdateSubscription<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub plan_id: Option<String>,
+    pub plan_id: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub offer_id: Option<String>,
+    pub offer_id: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quantity: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -90,7 +91,7 @@ pub struct UpdateSubscription {
     pub customer_notify: Option<bool>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum SubscriptionStatus {
     Created,
@@ -103,7 +104,7 @@ pub enum SubscriptionStatus {
     Expired,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum SubscriptionChangeSchedule {
     #[default]
@@ -111,12 +112,12 @@ pub enum SubscriptionChangeSchedule {
     CycleEnd,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Subscription {
-    pub id: String,
-    pub entity: String,
-    pub plan_id: String,
-    pub customer_id: Option<String>,
+    pub id: SubscriptionId,
+    pub entity: SubscriptionEntity,
+    pub plan_id: PlanId,
+    pub customer_id: Option<CustomerId>,
     pub total_count: u8,
     pub customer_notify: bool,
     #[serde(with = "ts_seconds")]
@@ -138,7 +139,7 @@ pub struct Subscription {
     pub auth_attempts: u64,
     #[serde(with = "ts_seconds")]
     pub expire_by: DateTime<Utc>,
-    pub offer_id: Option<String>,
+    pub offer_id: Option<OfferId>,
     pub short_url: String,
     pub has_scheduled_changes: bool,
     pub schedule_change_at: Option<SubscriptionChangeSchedule>,
@@ -148,14 +149,14 @@ pub struct Subscription {
 impl Subscription {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreateSubscription,
+        params: CreateSubscription<'_>,
     ) -> RazorpayResult<Subscription> {
         let res = razorpay
             .api
             .post(RequestParams {
                 url: "/subscriptions".to_owned(),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -165,13 +166,10 @@ impl Subscription {
         }
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        subscription_id: T,
-    ) -> RazorpayResult<Subscription>
-    where
-        T: Display,
-    {
+        subscription_id: &SubscriptionId,
+    ) -> RazorpayResult<Subscription> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -187,16 +185,19 @@ impl Subscription {
         }
     }
 
-    pub async fn all(
+    pub async fn list<T>(
         razorpay: &Razorpay,
-        data: AllSubscriptions,
-    ) -> RazorpayResult<Collection<Subscription>> {
+        params: T,
+    ) -> RazorpayResult<Collection<Subscription>>
+    where
+        T: for<'a> Into<Option<ListSubscriptions<'a>>>,
+    {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/subscription".to_owned(),
                 version: None,
-                data: Some(data),
+                data: params.into(),
             })
             .await?;
 
@@ -206,14 +207,13 @@ impl Subscription {
         }
     }
 
-    pub async fn cancel<T, U>(
+    pub async fn cancel<T>(
         razorpay: &Razorpay,
-        subscription_id: T,
-        cancel_at_cycle_end: U,
+        subscription_id: &SubscriptionId,
+        cancel_at_cycle_end: T,
     ) -> RazorpayResult<Subscription>
     where
-        T: Display,
-        U: Into<Option<bool>>,
+        T: Into<Option<bool>>,
     {
         let cancel_at_cycle_end =
             cancel_at_cycle_end.into().unwrap_or_default();
@@ -236,20 +236,17 @@ impl Subscription {
         }
     }
 
-    pub async fn update<T>(
+    pub async fn update(
         razorpay: &Razorpay,
-        subscription_id: T,
-        data: UpdateSubscription,
-    ) -> RazorpayResult<Subscription>
-    where
-        T: Display,
-    {
+        subscription_id: &SubscriptionId,
+        params: UpdateSubscription<'_>,
+    ) -> RazorpayResult<Subscription> {
         let res = razorpay
             .api
             .patch(RequestParams {
                 url: format!("/subscriptions/{}", subscription_id),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -259,13 +256,10 @@ impl Subscription {
         }
     }
 
-    pub async fn fetch_pending_update<T>(
+    pub async fn fetch_pending_update(
         razorpay: &Razorpay,
-        subscription_id: T,
-    ) -> RazorpayResult<Subscription>
-    where
-        T: Display,
-    {
+        subscription_id: &SubscriptionId,
+    ) -> RazorpayResult<Subscription> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -284,13 +278,10 @@ impl Subscription {
         }
     }
 
-    pub async fn cancel_scheduled_update<T>(
+    pub async fn cancel_scheduled_update(
         razorpay: &Razorpay,
-        subscription_id: T,
-    ) -> RazorpayResult<Subscription>
-    where
-        T: Display,
-    {
+        subscription_id: &SubscriptionId,
+    ) -> RazorpayResult<Subscription> {
         let res = razorpay
             .api
             .post(RequestParams {
@@ -309,13 +300,10 @@ impl Subscription {
         }
     }
 
-    pub async fn pause<T>(
+    pub async fn pause(
         razorpay: &Razorpay,
-        subscription_id: T,
-    ) -> RazorpayResult<Subscription>
-    where
-        T: Display,
-    {
+        subscription_id: &SubscriptionId,
+    ) -> RazorpayResult<Subscription> {
         let res = razorpay
             .api
             .post(RequestParams {
@@ -333,13 +321,10 @@ impl Subscription {
         }
     }
 
-    pub async fn resume<T>(
+    pub async fn resume(
         razorpay: &Razorpay,
-        subscription_id: T,
-    ) -> RazorpayResult<Subscription>
-    where
-        T: Display,
-    {
+        subscription_id: &SubscriptionId,
+    ) -> RazorpayResult<Subscription> {
         let res = razorpay
             .api
             .post(RequestParams {

@@ -3,6 +3,7 @@ use reqwest::{header::HeaderMap, Client, ClientBuilder};
 use serde::{de::DeserializeOwned, ser::Error, Serialize};
 use serde_json::{to_value, Value};
 
+#[derive(Debug)]
 pub struct Api {
     key_id: String,
     key_secret: String,
@@ -12,7 +13,6 @@ pub struct Api {
 }
 
 pub struct ApiOptions {
-    pub headers: HeaderMap,
     pub user_agent: String,
     pub base_url: String,
     pub key_id: String,
@@ -78,7 +78,7 @@ where
 
 impl Api {
     pub fn new(options: ApiOptions) -> Self {
-        let mut default_headers = options.headers;
+        let mut default_headers = HeaderMap::new();
         default_headers
             .insert("User-Agent", options.user_agent.parse().unwrap());
         Self {

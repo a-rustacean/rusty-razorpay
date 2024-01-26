@@ -1,14 +1,14 @@
-use std::fmt::Display;
-
 use crate::{
     api::RequestParams,
     common::{Country, Object},
     error::{InternalApiResult, RazorpayResult},
+    ids::AccountId,
     util::deserialize_notes,
     Razorpay,
 };
 use chrono::{serde::ts_seconds_option, DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
@@ -27,7 +27,7 @@ pub enum AccountStatus {
     Rejected,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum BusinessType {
     Proprietorship,
@@ -42,7 +42,7 @@ pub enum BusinessType {
     Huf,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum BusinessCategory {
     FinancialServices,
@@ -66,7 +66,7 @@ pub enum BusinessCategory {
     Others,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum BusinessSubCategory {
     // Financial services
@@ -485,7 +485,7 @@ pub enum BusinessSubCategory {
     TruckAndUtilityTrailerRentals,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Address {
     pub street1: String,
     pub street2: String,
@@ -495,28 +495,25 @@ pub struct Address {
     pub country: Country,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct BusinessAddresses {
     pub operation: Option<Address>,
     pub registered: Address,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct LegalInfo {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub pan: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub gst: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub cin: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct BrandInfo {
     pub color: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct BusinessProfile {
     pub category: BusinessCategory,
     pub subcategory: BusinessSubCategory,
@@ -529,37 +526,38 @@ pub struct BusinessProfile {
     pub addresses: BusinessAddresses,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct ContactDetails {
     pub email: String,
     pub phone: u64,
     pub policy_url: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct ContactInfo {
     pub chargeback: ContactDetails,
     pub refund: ContactDetails,
     pub support: ContactDetails,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct App {
     pub name: String,
     pub url: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Apps {
     pub websites: Vec<String>,
     pub android: Vec<App>,
     pub ios: Vec<App>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Account {
-    pub id: String,
-    pub r#type: AccountType,
+    pub id: AccountId,
+    #[serde(rename = "type")]
+    pub type_: AccountType,
     pub status: AccountStatus,
     pub email: String,
     pub phone: u64,
@@ -581,56 +579,108 @@ pub struct Account {
     pub hold_funds: bool,
 }
 
-#[derive(Debug, Serialize)]
-pub struct CreateAccountAddresses {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub operation: Option<Address>,
-    pub registered: Address,
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateAccountApp<'a> {
+    pub name: &'a str,
+    pub url: &'a str,
 }
 
-#[derive(Debug, Serialize)]
-pub struct CreateAccountProfile {
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateAccountApps<'a> {
+    pub websites: &'a [&'a str],
+    pub android: &'a [CreateAccountApp<'a>],
+    pub ios: &'a [CreateAccountApp<'a>],
+}
+
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateAccountContactDetails<'a> {
+    pub email: &'a str,
+    pub phone: u64,
+    pub policy_url: &'a str,
+}
+
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateAccountContactInfo<'a> {
+    pub chargeback: CreateAccountContactDetails<'a>,
+    pub refund: CreateAccountContactDetails<'a>,
+    pub support: CreateAccountContactDetails<'a>,
+}
+
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateAccountBrandInfo<'a> {
+    pub color: &'a str,
+}
+
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateAccountLegalInfo<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pan: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gst: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cin: Option<&'a str>,
+}
+
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateAccountAddress<'a> {
+    pub street1: &'a str,
+    pub street2: &'a str,
+    pub city: &'a str,
+    pub state: &'a str,
+    pub postal_code: u16,
+    pub country: Country,
+}
+
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateAccountAddresses<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub operation: Option<CreateAccountAddress<'a>>,
+    pub registered: CreateAccountAddress<'a>,
+}
+
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateAccountProfile<'a> {
     pub category: BusinessCategory,
     pub subcategory: BusinessSubCategory,
-    pub business_model: String,
-    pub addresses: CreateAccountAddresses,
+    pub business_model: &'a str,
+    pub addresses: CreateAccountAddresses<'a>,
 }
 
-#[derive(Debug, Serialize)]
-pub struct CreateAccount {
-    pub email: String,
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateAccount<'a> {
+    pub email: &'a str,
     pub phone: u64,
-    pub legal_business_name: String,
+    pub legal_business_name: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub customer_facing_business_name: Option<String>,
+    pub customer_facing_business_name: Option<&'a str>,
     pub business_type: BusinessType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reference_id: Option<String>,
+    pub reference_id: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub profile: Option<CreateAccountProfile>,
+    pub profile: Option<CreateAccountProfile<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub legal_info: Option<LegalInfo>,
+    pub legal_info: Option<CreateAccountLegalInfo<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub brand: Option<BrandInfo>,
+    pub brand: Option<CreateAccountBrandInfo<'a>>,
     pub notes: Object,
-    pub contact_name: String,
+    pub contact_name: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_info: Option<ContactInfo>,
+    pub contact_info: Option<CreateAccountContactInfo<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub apps: Option<Apps>,
+    pub apps: Option<CreateAccountApps<'a>>,
 }
 
 impl Account {
     pub async fn create(
         razorpay: &Razorpay,
-        data: CreateAccount,
+        params: CreateAccount<'_>,
     ) -> RazorpayResult<Account> {
         let res = razorpay
             .api
             .post(RequestParams {
                 url: "/accounts".to_owned(),
                 version: Some("v2".to_owned()),
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
@@ -640,13 +690,10 @@ impl Account {
         }
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        account_id: T,
-    ) -> RazorpayResult<Account>
-    where
-        T: Display,
-    {
+        account_id: &AccountId,
+    ) -> RazorpayResult<Account> {
         let res = razorpay
             .api
             .get(RequestParams {
@@ -669,14 +716,11 @@ impl Account {
     //
     // [docs]: https://razorpay.com/docs/api/partners/account-onboarding/update/
 
-    pub async fn delete<T>(
+    pub async fn delete(
         razorpay: &Razorpay,
-        account_id: T,
-    ) -> RazorpayResult<Account>
-    where
-        T: Display,
-    {
-        let res = razorpay
+        account_id: &AccountId,
+    ) -> RazorpayResult<()> {
+        let res: InternalApiResult<Value> = razorpay
             .api
             .delete(RequestParams {
                 url: format!("/accounts/{}", account_id),
@@ -686,7 +730,7 @@ impl Account {
             .await?;
 
         match res {
-            InternalApiResult::Ok(account) => Ok(account),
+            InternalApiResult::Ok(_) => Ok(()),
             InternalApiResult::Err { error } => Err(error.into()),
         }
     }

@@ -1,14 +1,13 @@
-use std::fmt::Display;
-
-use serde::Deserialize;
-
 use crate::{
     api::RequestParams,
+    entity::CardEntity,
     error::{InternalApiResult, RazorpayResult},
+    ids::CardId,
     Razorpay,
 };
+use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub enum CardNetwork {
     MasterCard,
     Visa,
@@ -22,7 +21,7 @@ pub enum CardNetwork {
     Unknown,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum CardTypeExtended {
     Credit,
@@ -31,28 +30,29 @@ pub enum CardTypeExtended {
     Unknown,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum CardType {
     Credit,
     Debit,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum CardSubType {
     Customer,
     Business,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Card {
-    pub id: String,
-    pub entity: String,
+    pub id: CardId,
+    pub entity: CardEntity,
     pub name: String,
     pub last4: String,
     pub network: CardNetwork,
-    pub r#type: CardTypeExtended,
+    #[serde(rename = "type")]
+    pub type_: CardTypeExtended,
     pub issuer: Option<String>,
     pub emi: bool,
     pub sub_type: CardSubType,
@@ -65,13 +65,10 @@ pub struct Card {
 // [something]: https://github.com/razorpay/razorpay-node/blob/753c07b6f2bea6c784c9866ad39fe761d93ed9ad/lib/resources/cards.js
 
 impl Card {
-    pub async fn fetch<T>(
+    pub async fn fetch(
         razorpay: &Razorpay,
-        card_id: T,
-    ) -> RazorpayResult<Card>
-    where
-        T: Display,
-    {
+        card_id: &CardId,
+    ) -> RazorpayResult<Card> {
         let res = razorpay
             .api
             .get(RequestParams {
