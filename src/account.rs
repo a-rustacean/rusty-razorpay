@@ -662,7 +662,8 @@ pub struct CreateAccount<'a> {
     pub legal_info: Option<CreateAccountLegalInfo<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub brand: Option<CreateAccountBrandInfo<'a>>,
-    pub notes: Object,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<Object>,
     pub contact_name: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contact_info: Option<CreateAccountContactInfo<'a>>,

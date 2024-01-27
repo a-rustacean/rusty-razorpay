@@ -25,8 +25,8 @@ pub struct CreateOrder<'a> {
     pub currency: Currency,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub receipt: Option<&'a str>,
-    #[serde(skip_serializing_if = "Object::is_empty")]
-    pub notes: Object,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<Object>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub partial_payment: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]

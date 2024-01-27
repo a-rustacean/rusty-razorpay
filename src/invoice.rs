@@ -173,8 +173,8 @@ pub struct CreateInvoice<'a> {
     pub partial_payment: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub currency: Option<Currency>,
-    #[serde(skip_serializing_if = "Object::is_empty")]
-    pub notes: Object,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<Object>,
 }
 
 impl Invoice {

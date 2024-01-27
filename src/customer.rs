@@ -36,8 +36,8 @@ pub struct CreateCustomer<'a> {
     pub fail_existing: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gstin: Option<&'a str>,
-    #[serde(skip_serializing_if = "Object::is_empty")]
-    pub notes: Object,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<Object>,
 }
 
 #[derive(Debug, Serialize, Clone, Eq, PartialEq)]

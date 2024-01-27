@@ -57,8 +57,8 @@ pub struct CreateSubscription<'a> {
     pub addons: &'a [CreateSubscriptionAddon<'a>],
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offer_id: Option<&'a OfferId>,
-    #[serde(skip_serializing_if = "Object::is_empty")]
-    pub notes: Object,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<Object>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notify_info: Option<CreateSubscriptionNotifyInfo<'a>>,
 }

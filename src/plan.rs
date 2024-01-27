@@ -23,7 +23,8 @@ pub struct CreatePlanItem<'a> {
 pub struct CreatePlan<'a> {
     pub interval: u8,
     pub period: PlanPeriod,
-    pub notes: Object,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<Object>,
     pub item: CreatePlanItem<'a>,
 }
 

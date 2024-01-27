@@ -184,7 +184,8 @@ pub struct CreateInstantSettlement<'a> {
     pub settle_full_balance: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<&'a str>,
-    pub notes: Object,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<Object>,
 }
 
 impl Settlement {
