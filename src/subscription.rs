@@ -63,6 +63,23 @@ pub struct CreateSubscription<'a> {
     pub notify_info: Option<CreateSubscriptionNotifyInfo<'a>>,
 }
 
+impl<'a> CreateSubscription<'a> {
+    pub fn new(plan_id: &'a PlanId) -> Self {
+        Self {
+            plan_id,
+            total_count: 1,
+            quantity: None,
+            start_at: None,
+            expire_by: None,
+            customer_notify: None,
+            addons: &[],
+            offer_id: None,
+            notes: None,
+            notify_info: None,
+        }
+    }
+}
+
 #[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
 pub struct ListSubscriptions<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
