@@ -191,7 +191,7 @@ pub struct CreateInstantSettlement<'a> {
 impl Settlement {
     pub async fn list<T>(
         razorpay: &Razorpay,
-        data: T,
+        params: T,
     ) -> RazorpayResult<Collection<Settlement>>
     where
         T: Into<Option<Filter>>,
@@ -201,7 +201,7 @@ impl Settlement {
             .get(RequestParams {
                 url: "/settlements".to_owned(),
                 version: None,
-                data: data.into(),
+                data: params.into(),
             })
             .await?;
 

@@ -42,14 +42,14 @@ impl Addon {
     pub async fn create(
         razorpay: &Razorpay,
         subscription_id: &SubscriptionId,
-        data: CreateAddon<'_>,
+        params: CreateAddon<'_>,
     ) -> RazorpayResult<Addon> {
         let res = razorpay
             .api
             .post(RequestParams {
                 url: format!("/subscriptions/{}/addons", subscription_id),
                 version: None,
-                data: Some(data),
+                data: Some(params),
             })
             .await?;
 
