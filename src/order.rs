@@ -42,7 +42,7 @@ pub enum OrderExpand {
     VirtualAccount,
 }
 
-#[derive(Debug, Serialize, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
 pub struct ListOrders<'a> {
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub filter: Option<Filter>,

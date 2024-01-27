@@ -28,11 +28,23 @@ pub struct CreatePlan<'a> {
     pub item: CreatePlanItem<'a>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+impl<'a> Default for CreatePlan<'a> {
+    fn default() -> Self {
+        Self {
+            interval: 1,
+            period: Default::default(),
+            notes: None,
+            item: Default::default(),
+        }
+    }
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum PlanPeriod {
     Daily,
     Weekly,
+    #[default]
     Monthly,
     Yearly,
 }

@@ -53,7 +53,7 @@ pub struct CreateItem<'a> {
     pub currency: Currency,
 }
 
-#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
 pub struct UpdateItem<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<&'a str>,
@@ -67,7 +67,7 @@ pub struct UpdateItem<'a> {
     pub active: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
 pub struct ListItems {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,

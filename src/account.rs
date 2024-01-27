@@ -27,9 +27,10 @@ pub enum AccountStatus {
     Rejected,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum BusinessType {
+    #[default]
     Proprietorship,
     Partnership,
     PrivateLimited,
@@ -646,7 +647,7 @@ pub struct CreateAccountProfile<'a> {
     pub addresses: CreateAccountAddresses<'a>,
 }
 
-#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
 pub struct CreateAccount<'a> {
     pub email: &'a str,
     pub phone: u64,

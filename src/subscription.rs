@@ -71,7 +71,7 @@ pub struct ListSubscriptions<'a> {
     pub filter: Option<Filter>,
 }
 
-#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
 pub struct UpdateSubscription<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub plan_id: Option<&'a str>,

@@ -29,6 +29,15 @@ pub struct CreateAddon<'a> {
     pub quantity: u64,
 }
 
+impl<'a> Default for CreateAddon<'a> {
+    fn default() -> Self {
+        Self {
+            item: Default::default(),
+            quantity: 1,
+        }
+    }
+}
+
 impl Addon {
     pub async fn create(
         razorpay: &Razorpay,

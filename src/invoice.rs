@@ -97,7 +97,7 @@ pub enum CreateInvoiceType {
     Invoice,
 }
 
-#[derive(Debug, Serialize, Clone, Eq, PartialEq)]
+#[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
 pub struct CreateInvoiceCustomerAddress<'a> {
     pub line1: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -121,7 +121,7 @@ pub struct CreateInvoiceCustomer<'a> {
     pub shipping_address: Option<CreateInvoiceCustomerAddress<'a>>,
 }
 
-#[derive(Debug, Serialize, Clone, Eq, PartialEq)]
+#[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
 pub struct CreateInvoiceLineItem<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub item_id: Option<&'a str>,

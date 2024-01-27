@@ -57,7 +57,7 @@ pub struct Refund {
     pub speed_processed: Option<RefundSpeed>,
 }
 
-#[derive(Debug, Serialize, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
 pub struct CreateRefund<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<u64>,
