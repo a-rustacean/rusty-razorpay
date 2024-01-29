@@ -204,7 +204,7 @@ pub enum WebhookEvent {
     #[serde(rename = "product.payment_gateway.activated_kyc_pending")]
     ProductPaymentGatewayActivatedKYCPending,
 
-    // Oauth parter events
+    // Oauth partner events
     #[serde(rename = "account.app.authorization_revoked")]
     AccountAppAuthorizationRevoked,
 
