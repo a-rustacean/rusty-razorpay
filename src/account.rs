@@ -6,6 +6,8 @@ use crate::{
     util::deserialize_notes,
     Razorpay,
 };
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, format, string::String, vec::Vec};
 use chrono::{serde::ts_seconds_option, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

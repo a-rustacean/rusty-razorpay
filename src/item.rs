@@ -5,6 +5,8 @@ use crate::{
     ids::ItemId,
     Razorpay,
 };
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, format, string::String};
 use chrono::{
     serde::{ts_seconds, ts_seconds_option},
     DateTime, Utc,

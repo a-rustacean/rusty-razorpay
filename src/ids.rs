@@ -3,8 +3,21 @@
 //
 // [async-stripe]: https://docs.rs/async-stripe/0.31.0/src/stripe/ids.rs.html#3-465
 
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+#[cfg(not(feature = "std"))]
+use core::{
+    cmp::{Ordering, PartialOrd},
+    fmt::{Display, Formatter, Result as FormatterResult},
+    ops::Deref,
+    str::FromStr,
+};
 use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
-use std::{error::Error, fmt::Display, ops::Deref, str::FromStr};
+#[cfg(feature = "std")]
+use std::{
+    cmp::{Ordering, PartialOrd},
+    fmt::{Display, Formatter, Result as FormatterResult},
+};
 
 macro_rules! def_id_serde_impls {
     ($struct_name:ident) => {
@@ -71,13 +84,13 @@ macro_rules! def_id {
         }
 
         impl PartialOrd for $struct_name {
-            fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
                 Some(self.cmp(other))
             }
         }
 
         impl Ord for $struct_name {
-            fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+            fn cmp(&self, other: &Self) -> Ordering {
                 self.as_str().cmp(other.as_str())
             }
         }
@@ -97,7 +110,7 @@ macro_rules! def_id {
         }
 
         impl Display for $struct_name {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn fmt(&self, f: &mut Formatter<'_>) -> FormatterResult {
                 self.0.fmt(f)
             }
         }
@@ -107,9 +120,6 @@ macro_rules! def_id {
 
             fn from_str(s: &str) -> Result<Self, Self::Err> {
                 if !s.starts_with($prefix) {
-                    // N.B. For debugging
-                    eprintln!("bad id is: {} (expected: {:?}) for {}", s, $prefix, stringify!($struct_name));
-
                     Err(ParseIdError {
                         typename: stringify!($struct_name),
                         expected: stringify!(id to start with $prefix),
@@ -130,15 +140,15 @@ pub struct ParseIdError {
     expected: &'static str,
 }
 
-impl Display for ParseIdError {
+#[cfg(feature = "std")]
+impl std::display::Display for ParseIdError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "invalid `{}`, expected {}", self.typename, self.expected)
     }
 }
-
-impl Error for ParseIdError {
-    fn description(&self) -> &str {
-        "error parsing an id"
+impl Display for ParseIdError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatterResult {
+        write!(f, "invalid `{}`, expected {}", self.typename, self.expected)
     }
 }
 

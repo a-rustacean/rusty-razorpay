@@ -7,6 +7,8 @@ use crate::{
     item::{CreateItem, Item},
     InvoiceId, Razorpay,
 };
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, format, string::String};
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

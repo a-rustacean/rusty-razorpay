@@ -5,6 +5,8 @@ use crate::{
     ids::DocumentId,
     Razorpay,
 };
+#[cfg(not(feature = "std"))]
+use alloc::{format, string::String};
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::Deserialize;
 

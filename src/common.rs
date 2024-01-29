@@ -1,5 +1,10 @@
+#[cfg(not(feature = "std"))]
+use alloc::{string::String, vec::Vec};
 use chrono::{serde::ts_seconds_option, DateTime, Utc};
+#[cfg(not(feature = "std"))]
+use hashbrown::HashMap;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "std")]
 use std::collections::HashMap;
 
 use crate::entity::CollectionEntity;

@@ -8,6 +8,8 @@ use crate::{
     util::deserialize_notes,
     Razorpay,
 };
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, format};
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -70,7 +72,7 @@ impl Plan {
         let res = razorpay
             .api
             .post(crate::api::RequestParams {
-                url: "/plans".to_string(),
+                url: "/plans".to_owned(),
                 version: None,
                 data: Some(params),
             })

@@ -1,4 +1,8 @@
 use crate::error::RazorpayResult;
+#[cfg(not(feature = "std"))]
+use alloc::{
+    borrow::ToOwned, format, string::String, string::ToString, vec, vec::Vec,
+};
 use reqwest::{header::HeaderMap, Client, ClientBuilder};
 use serde::{de::DeserializeOwned, ser::Error, Serialize};
 use serde_json::{to_value, Value};

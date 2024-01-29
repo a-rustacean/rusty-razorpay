@@ -9,6 +9,8 @@ use crate::{
     util::{deserialize_notes, serialize_bool_as_int_option},
     InvoiceId, OrderId, PaymentId, Razorpay,
 };
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, string::String, vec::Vec};
 use chrono::{
     serde::{ts_seconds, ts_seconds_option},
     DateTime, Utc,

@@ -3,10 +3,20 @@ use crate::{
     invoice::Invoice, order::Order, payment::Payment, refund::Refund,
     subscription::Subscription, util::generate_webhook_signature,
 };
+#[cfg(not(feature = "std"))]
+use alloc::{string::String, vec::Vec};
 use chrono::{serde::ts_seconds, DateTime, Utc};
+#[cfg(not(feature = "std"))]
+use core::fmt::{Display, Formatter, Result as FormatterResult};
+#[cfg(not(feature = "std"))]
+use hashbrown::HashMap;
 use serde::Deserialize;
 use serde_json::Value;
-use std::{collections::HashMap, error::Error, fmt::Display};
+#[cfg(feature = "std")]
+use std::{
+    collections::HashMap,
+    fmt::{Display, Formatter, Result as FormatterResult},
+};
 
 #[derive(Debug)]
 pub enum WebhookError {
@@ -15,7 +25,7 @@ pub enum WebhookError {
 }
 
 impl Display for WebhookError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatterResult {
         match self {
             WebhookError::ParseError(error) => {
                 write!(f, "Parsing error: {}", error)
@@ -25,7 +35,8 @@ impl Display for WebhookError {
     }
 }
 
-impl Error for WebhookError {}
+#[cfg(feature = "std")]
+impl std::error::Error for WebhookError {}
 
 impl From<serde_json::error::Error> for WebhookError {
     fn from(error: serde_json::error::Error) -> Self {

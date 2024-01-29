@@ -5,6 +5,8 @@ use crate::{
     ids::CardId,
     Razorpay,
 };
+#[cfg(not(feature = "std"))]
+use alloc::{format, string::String};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]

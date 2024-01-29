@@ -1,7 +1,14 @@
 use crate::common::Object;
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, format, string::String};
+#[cfg(not(feature = "std"))]
+use core::fmt::{Debug, Display};
 use data_encoding::HEXLOWER;
 use ring::hmac;
 use serde::{Deserialize, Deserializer, Serializer};
+#[cfg(feature = "std")]
+use std::fmt::{Debug, Display};
+#[cfg(feature = "std")]
 use std::fmt::{Debug, Display};
 
 #[derive(Debug, Deserialize)]

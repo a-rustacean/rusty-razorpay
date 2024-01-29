@@ -2,8 +2,13 @@ use crate::{
     common::Object,
     util::{debug_option, display_option},
 };
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+#[cfg(not(feature = "std"))]
+use core::fmt::{Display, Formatter, Result as FormatterResult};
 use serde::Deserialize;
-use std::{error::Error, fmt::Display};
+#[cfg(feature = "std")]
+use std::fmt::{Display, Formatter, Result as FormatterResult};
 
 #[derive(Debug, Deserialize)]
 pub struct ApiError {
@@ -17,7 +22,7 @@ pub struct ApiError {
 }
 
 impl Display for ApiError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatterResult {
         write!(
             f,
             "Razorpay Error: {}: {}\n\nsource: {}\nstep: {}\nreason: {}\nfield: {}\nmetadata: {}",
@@ -27,7 +32,8 @@ impl Display for ApiError {
     }
 }
 
-impl Error for ApiError {}
+#[cfg(feature = "std")]
+impl std::error::Error for ApiError {}
 
 #[derive(Debug)]
 pub enum RazorpayError {
@@ -37,7 +43,7 @@ pub enum RazorpayError {
 }
 
 impl Display for RazorpayError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatterResult {
         match self {
             RazorpayError::ApiError(error) => write!(f, "API Error: {}", error),
             RazorpayError::ReqwestError(error) => {
@@ -68,7 +74,8 @@ impl From<serde_json::Error> for RazorpayError {
     }
 }
 
-impl Error for RazorpayError {}
+#[cfg(feature = "std")]
+impl std::error::Error for RazorpayError {}
 
 pub type RazorpayResult<T> = Result<T, RazorpayError>;
 

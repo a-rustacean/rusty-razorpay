@@ -1,4 +1,6 @@
 use crate::{common::Currency, LineItemId};
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]

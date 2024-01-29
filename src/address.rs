@@ -1,4 +1,6 @@
 use crate::AddressId;
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]

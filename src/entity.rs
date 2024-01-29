@@ -1,5 +1,7 @@
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+use core::{fmt::Display, ops::Deref, str::FromStr};
 use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
-use std::{error::Error, fmt::Display, ops::Deref, str::FromStr};
 
 macro_rules! def_entity {
     ($struct_name:ident, $value:literal) => {
@@ -36,7 +38,7 @@ macro_rules! def_entity {
         }
 
         impl Display for $struct_name {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
                 write!(f, $value)
             }
         }
@@ -70,12 +72,13 @@ pub struct EntityMismatch {
 }
 
 impl Display for EntityMismatch {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "invalid `{}`, expected {}", self.typename, self.expected)
     }
 }
 
-impl Error for EntityMismatch {
+#[cfg(feature = "std")]
+impl std::error::Error for EntityMismatch {
     fn description(&self) -> &str {
         "entity type mismatch"
     }
