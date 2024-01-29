@@ -8,8 +8,6 @@ use ring::hmac;
 use serde::{Deserialize, Deserializer, Serializer};
 #[cfg(feature = "std")]
 use std::fmt::{Debug, Display};
-#[cfg(feature = "std")]
-use std::fmt::{Debug, Display};
 
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]

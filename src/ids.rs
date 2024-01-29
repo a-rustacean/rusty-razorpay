@@ -17,6 +17,8 @@ use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
 use std::{
     cmp::{Ordering, PartialOrd},
     fmt::{Display, Formatter, Result as FormatterResult},
+    ops::Deref,
+    str::FromStr,
 };
 
 macro_rules! def_id_serde_impls {
@@ -140,12 +142,6 @@ pub struct ParseIdError {
     expected: &'static str,
 }
 
-#[cfg(feature = "std")]
-impl std::display::Display for ParseIdError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "invalid `{}`, expected {}", self.typename, self.expected)
-    }
-}
 impl Display for ParseIdError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FormatterResult {
         write!(f, "invalid `{}`, expected {}", self.typename, self.expected)
