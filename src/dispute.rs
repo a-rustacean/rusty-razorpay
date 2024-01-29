@@ -46,7 +46,7 @@ pub struct DisputeEvidence {
     pub shipping_proof: Option<Vec<String>>,
     pub billing_proof: Option<Vec<String>>,
     pub cancellation_proof: Option<Vec<String>>,
-    pub cutomer_communication: Option<Vec<String>>,
+    pub customer_communication: Option<Vec<String>>,
     pub proof_of_service: Option<Vec<String>>,
     pub explanation_letter: Option<Vec<String>>,
     pub refund_confirmation: Option<Vec<String>>,
@@ -69,7 +69,7 @@ pub struct Dispute {
     pub reason_code: String,
     pub reason_description: String,
     #[serde(with = "ts_seconds")]
-    pub resopond_by: DateTime<Utc>,
+    pub respond_by: DateTime<Utc>,
     pub status: DisputeStatus,
     pub phase: DisputePhase,
     #[serde(with = "ts_seconds")]
@@ -86,7 +86,7 @@ pub enum ContestDisputeAction {
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq, Eq)]
-pub struct ContestDiputeOtherEvidence<'a> {
+pub struct ContestDisputeOtherEvidence<'a> {
     #[serde(rename = "type")]
     pub type_: &'a str,
     pub document_ids: &'a [&'a str],
@@ -99,14 +99,14 @@ pub struct ContestDispute<'a> {
     pub shipping_proof: Option<&'a [&'a str]>,
     pub billing_proof: Option<&'a [&'a str]>,
     pub cancellation_proof: Option<&'a [&'a str]>,
-    pub cutomer_communication: Option<&'a [&'a str]>,
+    pub customer_communication: Option<&'a [&'a str]>,
     pub proof_of_service: Option<&'a [&'a str]>,
     pub explanation_letter: Option<&'a [&'a str]>,
     pub refund_confirmation: Option<&'a [&'a str]>,
     pub access_activity_log: Option<&'a [&'a str]>,
     pub refund_cancellation_policy: Option<&'a [&'a str]>,
     pub term_and_conditions: Option<&'a [&'a str]>,
-    pub others: Option<&'a [ContestDiputeOtherEvidence<'a>]>,
+    pub others: Option<&'a [ContestDisputeOtherEvidence<'a>]>,
     pub action: ContestDisputeAction,
 }
 
