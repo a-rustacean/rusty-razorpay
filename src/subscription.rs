@@ -8,10 +8,7 @@ use crate::{
     util::{deserialize_notes, serialize_bool_as_int_option},
     Razorpay,
 };
-use chrono::{
-    serde::{ts_seconds, ts_seconds_option},
-    DateTime, Utc,
-};
+use chrono::{serde::ts_seconds_option, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
@@ -137,25 +134,26 @@ pub struct Subscription {
     pub customer_id: Option<CustomerId>,
     pub total_count: u8,
     pub customer_notify: bool,
-    #[serde(with = "ts_seconds")]
-    pub start_at: DateTime<Utc>,
+    #[serde(with = "ts_seconds_option")]
+    pub start_at: Option<DateTime<Utc>>,
     pub quantity: u64,
     #[serde(deserialize_with = "deserialize_notes")]
     pub notes: Object,
+    #[serde(default)]
     pub addons: Vec<Addon>,
     pub status: SubscriptionStatus,
     pub paid_count: u64,
-    #[serde(with = "ts_seconds")]
-    pub current_start: DateTime<Utc>,
-    #[serde(with = "ts_seconds")]
-    pub current_end: DateTime<Utc>,
+    #[serde(with = "ts_seconds_option")]
+    pub current_start: Option<DateTime<Utc>>,
+    #[serde(with = "ts_seconds_option")]
+    pub current_end: Option<DateTime<Utc>>,
     #[serde(with = "ts_seconds_option")]
     pub ended_at: Option<DateTime<Utc>>,
-    #[serde(with = "ts_seconds")]
-    pub charge_at: DateTime<Utc>,
+    #[serde(with = "ts_seconds_option")]
+    pub charge_at: Option<DateTime<Utc>>,
     pub auth_attempts: u64,
-    #[serde(with = "ts_seconds")]
-    pub expire_by: DateTime<Utc>,
+    #[serde(with = "ts_seconds_option")]
+    pub expire_by: Option<DateTime<Utc>>,
     pub offer_id: Option<OfferId>,
     pub short_url: String,
     pub has_scheduled_changes: bool,
