@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.3
+
+- add no_std support
+
 ## v0.2.2
 
 - update `Subscription` struct schema to match razorpay API
