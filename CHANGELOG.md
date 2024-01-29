@@ -1,6 +1,14 @@
-# v0.2.1
+# Changelog
 
-## What's changed
+## v0.2.2
+
+- update `Subscription` struct schema to match razorpay API
+- fix typos
+- make entity types un-constructable without parsing
+
+**Full Changelog**: [v0.2.1...v0.2.2](https://github.com/a-rustacean/rusty-razorpay/compare/v0.2.1...v0.2.2)
+
+## v0.2.1
 
 - use `Option<Object>` instead of `Object` for notes
 - derive and implement `Default` trait for common traits with many fields
@@ -12,8 +20,6 @@
 
 ## v0.2.0
 
-## What's changed
-
 - add typed IDs:
   `OrderId`, `CustomerId`, `SubscriptionId`, ... instead of just `String`
 - add zero-sized structs for each entity type: each entity has a field called `entity` which can have only a single possible value, for example, the `Order` entity can only have `"order"` as the value of its `entity` field, so no allocation is needed, we only need to check it once when creating (deserializing).
@@ -24,6 +30,6 @@
 
 **Full Changelog**: [v0.1.0...v0.2.0](https://github.com/a-rustacean/rusty-razorpay/compare/v0.1.0...v0.2.0)
 
-# v0.1.0
+## v0.1.0
 
 **Full Changelog**: [v0.1.0](https://github.com/a-rustacean/rusty-razorpay/commits/v0.1.0)
