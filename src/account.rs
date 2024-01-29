@@ -330,7 +330,7 @@ pub enum BusinessSubCategory {
     LaundryServices,
     ElectricalContractors,
     DebtMarriagePersonalCounselingService,
-    AirConditioningAndRefigerationRepairShops,
+    AirConditioningAndRefrigerationRepairShops,
     CreditReportingAgencies,
     HeatingAndPlumbingContractors,
     CarpetAndUpholsteryCleaningServices,
@@ -376,7 +376,7 @@ pub enum BusinessSubCategory {
     FacilityManagement,
     #[serde(rename = "rwa")]
     RWA,
-    Cowoking,
+    Coworking,
     RealestateClassifieds,
     SpaceRental,
 
