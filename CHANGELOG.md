@@ -1,8 +1,17 @@
 # Changelog
 
+## v0.2.4
+
+- fix errors on std feature
+- update dependencies
+
+**Full Changelog**: [v0.2.3...v0.2.4](https://github.com/a-rustacean/rusty-razorpay/compare/v0.2.4...v0.2.4)
+
 ## v0.2.3
 
 - add no_std support
+
+**Full Changelog**: [v0.2.2...v0.2.3](https://github.com/a-rustacean/rusty-razorpay/compare/v0.2.2...v0.2.3)
 
 ## v0.2.2
 
@@ -28,7 +37,7 @@
   `OrderId`, `CustomerId`, `SubscriptionId`, ... instead of just `String`
 - add zero-sized structs for each entity type: each entity has a field called `entity` which can have only a single possible value, for example, the `Order` entity can only have `"order"` as the value of its `entity` field, so no allocation is needed, we only need to check it once when creating (deserializing).
 - use borrowed values in temporary structs:
-  structs like  `CreateOrder` are not meant to be stored somewhere, they are created very often like on every request, so it is reasonable to use borrowed values instead of owned values for these structs where possible
+  structs like `CreateOrder` are not meant to be stored somewhere, they are created very often like on every request, so it is reasonable to use borrowed values instead of owned values for these structs where possible
 - use optional filters when listing all items
 - improve method scopes and names
 
