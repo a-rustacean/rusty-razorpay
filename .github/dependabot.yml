@@ -6,4 +6,3 @@ updates:
       interval: "daily"
     assignees:
       - "a-rustacean"
-    target-branch: "dev"
