@@ -14,7 +14,7 @@ pub enum CardNetwork {
     RuPay,
     #[serde(rename = "American Express")]
     AmericanExpress,
-    #[serde(rename = "Dirners Club")]
+    #[serde(rename = "Diners Club")]
     DinersClub,
     Maestro,
     #[serde(rename = "unknown")]
