@@ -4,7 +4,9 @@ use std::{error::Error, fmt::Display, ops::Deref, str::FromStr};
 macro_rules! def_entity {
     ($struct_name:ident, $value:literal) => {
         #[derive(Debug, Clone, Default, Eq, PartialEq, Hash)]
-        pub struct $struct_name([u8; 0]);
+        pub struct $struct_name {
+            _private: ()
+        }
 
         impl Serialize for $struct_name {
             fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -55,7 +57,7 @@ macro_rules! def_entity {
                         expected: stringify!(entity to be $val),
                     });
                 }
-                Ok(Self([]))
+                Ok(Self { _private: () })
             }
         }
     };
