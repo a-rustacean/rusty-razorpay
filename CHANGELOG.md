@@ -8,9 +8,9 @@
 - lower version requirements for `smol_str`
 - rename function arguments
 
-**Full Changelog**: https://github.com/a-rustacean/rusty-razorpay/compare/v0.2.0...v0.2.1
+**Full Changelog**: [v0.2.0...v0.2.1](https://github.com/a-rustacean/rusty-razorpay/compare/v0.2.0...v0.2.1)
 
-# v0.2.0
+## v0.2.0
 
 ## What's changed
 
@@ -22,8 +22,8 @@
 - use optional filters when listing all items
 - improve method scopes and names
 
-**Full Changelog**: https://github.com/a-rustacean/rusty-razorpay/compare/v0.1.0...v0.2.0
+**Full Changelog**: [v0.1.0...v0.2.0](https://github.com/a-rustacean/rusty-razorpay/compare/v0.1.0...v0.2.0)
 
 # v0.1.0
 
-**Full Changelog**: https://github.com/a-rustacean/rusty-razorpay/commits/v0.1.0
+**Full Changelog**: [v0.1.0](https://github.com/a-rustacean/rusty-razorpay/commits/v0.1.0)
