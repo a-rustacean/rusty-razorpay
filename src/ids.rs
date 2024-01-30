@@ -148,6 +148,9 @@ impl Display for ParseIdError {
     }
 }
 
+#[cfg(feature = "std")]
+impl std::error::Error for ParseIdError {}
+
 def_id!(CardId, "card_");
 def_id!(ItemId, "item_");
 def_id!(PlanId, "plan_");
