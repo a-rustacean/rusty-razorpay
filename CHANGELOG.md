@@ -5,7 +5,7 @@
 - fix errors on std feature
 - update dependencies
 
-**Full Changelog**: [v0.2.3...v0.2.4](https://github.com/a-rustacean/rusty-razorpay/compare/v0.2.4...v0.2.4)
+**Full Changelog**: [v0.2.3...v0.2.4](https://github.com/a-rustacean/rusty-razorpay/compare/v0.2.3...v0.2.4)
 
 ## v0.2.3
 
