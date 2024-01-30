@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.5
+
+- implement `std::error::Error` for `ParseIdError` in std feature
+
+**Full Changelog**: [v0.2.4...v0.2.5](https://github.com/a-rustacean/rusty-razorpay/compare/v0.2.4...v0.2.5)
+
 ## v0.2.4
 
 - fix errors on std feature
