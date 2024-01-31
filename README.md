@@ -12,12 +12,12 @@ rusty-razorpay = "0.2.5"
 
 ## Progress
 
-- [ ] Account
+- [x] Account
   - [x] Types
-  - [ ] APIs
+  - [x] APIs
     - [x] Create
     - [x] Fetch
-    - [ ] Update
+    - [x] Update
     - [x] Delete
 - [x] Addon
   - [x] Types

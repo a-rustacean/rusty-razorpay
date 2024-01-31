@@ -583,39 +583,39 @@ pub struct Account {
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq, Eq)]
-pub struct CreateAccountApp<'a> {
+pub struct CreateOrUpdateAccountApp<'a> {
     pub name: &'a str,
     pub url: &'a str,
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq, Eq)]
-pub struct CreateAccountApps<'a> {
+pub struct CreateOrUpdateAccountApps<'a> {
     pub websites: &'a [&'a str],
-    pub android: &'a [CreateAccountApp<'a>],
-    pub ios: &'a [CreateAccountApp<'a>],
+    pub android: &'a [CreateOrUpdateAccountApp<'a>],
+    pub ios: &'a [CreateOrUpdateAccountApp<'a>],
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq, Eq)]
-pub struct CreateAccountContactDetails<'a> {
+pub struct CreateOrUpdateAccountContactDetails<'a> {
     pub email: &'a str,
     pub phone: u64,
     pub policy_url: &'a str,
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq, Eq)]
-pub struct CreateAccountContactInfo<'a> {
-    pub chargeback: CreateAccountContactDetails<'a>,
-    pub refund: CreateAccountContactDetails<'a>,
-    pub support: CreateAccountContactDetails<'a>,
+pub struct CreateOrUpdateAccountContactInfo<'a> {
+    pub chargeback: CreateOrUpdateAccountContactDetails<'a>,
+    pub refund: CreateOrUpdateAccountContactDetails<'a>,
+    pub support: CreateOrUpdateAccountContactDetails<'a>,
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq, Eq)]
-pub struct CreateAccountBrandInfo<'a> {
+pub struct CreateOrUpdateAccountBrandInfo<'a> {
     pub color: &'a str,
 }
 
 #[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
-pub struct CreateAccountLegalInfo<'a> {
+pub struct CreateOrUpdateAccountLegalInfo<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pan: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -625,7 +625,7 @@ pub struct CreateAccountLegalInfo<'a> {
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq, Eq)]
-pub struct CreateAccountAddress<'a> {
+pub struct CreateOrUpdateAccountAddress<'a> {
     pub street1: &'a str,
     pub street2: &'a str,
     pub city: &'a str,
@@ -635,18 +635,18 @@ pub struct CreateAccountAddress<'a> {
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq, Eq)]
-pub struct CreateAccountAddresses<'a> {
+pub struct CreateOrUpdateAccountAddresses<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub operation: Option<CreateAccountAddress<'a>>,
-    pub registered: CreateAccountAddress<'a>,
+    pub operation: Option<CreateOrUpdateAccountAddress<'a>>,
+    pub registered: CreateOrUpdateAccountAddress<'a>,
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq, Eq)]
-pub struct CreateAccountProfile<'a> {
+pub struct CreateOrUpdateAccountProfile<'a> {
     pub category: BusinessCategory,
     pub subcategory: BusinessSubCategory,
     pub business_model: &'a str,
-    pub addresses: CreateAccountAddresses<'a>,
+    pub addresses: CreateOrUpdateAccountAddresses<'a>,
 }
 
 #[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
@@ -660,18 +660,48 @@ pub struct CreateAccount<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reference_id: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub profile: Option<CreateAccountProfile<'a>>,
+    pub profile: Option<CreateOrUpdateAccountProfile<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub legal_info: Option<CreateAccountLegalInfo<'a>>,
+    pub legal_info: Option<CreateOrUpdateAccountLegalInfo<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub brand: Option<CreateAccountBrandInfo<'a>>,
+    pub brand: Option<CreateOrUpdateAccountBrandInfo<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<Object>,
     pub contact_name: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_info: Option<CreateAccountContactInfo<'a>>,
+    pub contact_info: Option<CreateOrUpdateAccountContactInfo<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub apps: Option<CreateAccountApps<'a>>,
+    pub apps: Option<CreateOrUpdateAccountApps<'a>>,
+}
+
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct UpdateAccount<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phone: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub legal_business_name: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub customer_facing_business_name: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub business_type: Option<BusinessType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reference_id: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub profile: Option<CreateOrUpdateAccountProfile<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub legal_info: Option<CreateOrUpdateAccountLegalInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub brand: Option<CreateOrUpdateAccountBrandInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<Object>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_name: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_info: Option<CreateOrUpdateAccountContactInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub apps: Option<CreateOrUpdateAccountApps<'a>>,
 }
 
 impl Account {
@@ -713,12 +743,25 @@ impl Account {
         }
     }
 
-    // TODO: Add update api
-    //
-    // It isn't clear in the [docs] which of the field can be
-    // updated, so needs more research
-    //
-    // [docs]: https://razorpay.com/docs/api/partners/account-onboarding/update/
+    pub async fn update(
+        razorpay: &Razorpay,
+        account_id: &AccountId,
+        params: UpdateAccount<'_>,
+    ) -> RazorpayResult<Account> {
+        let res = razorpay
+            .api
+            .post(RequestParams {
+                url: format!("/accounts/{}", account_id),
+                version: Some("v2".to_owned()),
+                data: Some(params),
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(account) => Ok(account),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
 
     pub async fn delete(
         razorpay: &Razorpay,
