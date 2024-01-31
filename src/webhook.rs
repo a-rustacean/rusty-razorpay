@@ -300,6 +300,27 @@ pub enum WebhookPayloadItem {
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct WebhookPayload {
     pub entity: WebhookPayloadItem,
+    pub data: Option<Value>,
+    //  ^^^^
+    //    |
+    //     "--------------------.
+    //                           |
+    // TODO: add concrete type   |
+    //                           |
+    //                .---------"
+    //               |
+    // The type of this field is'nt clear in the docs, in the
+    // [merchant account activated] docs it has the value `[]`
+    // which indicates that it has the type `Vec<_>` but in
+    // [merchant account needs clarification] docs it is an
+    // object, I have previously came across this same problem
+    // with `notes`, in the razorpay API an empty array `[]`
+    // could represent an empty object `{}`, so it could be that
+    // in the [merchant account activated] docs it is representing
+    // an empty object, needs more testing.
+    //
+    // [merchant account activated]: https://razorpay.com/docs/webhooks/payloads/partners/
+    // [merchant account needs clarification]: https://razorpay.com/docs/webhooks/payloads/partners/needs-clarification/
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
