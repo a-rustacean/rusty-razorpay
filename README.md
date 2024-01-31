@@ -12,24 +12,46 @@ rusty-razorpay = "0.2.5"
 
 ## Progress
 
-- [x] Account
+- [ ] Account
+  - [x] Create
+  - [x] Fetch
+  - [x] Delete
+  - [ ] Update
 - [x] Addon
-- [x] Card
+- [x] Address
+- [ ] Card
+  - [x] Fetch
+  - [ ] Fingerprint
 - [x] Customer
 - [ ] Fund account
-- [ ] IINS
-- [x] Invoice
 - [x] Dispute
-- [x] Document
+- [ ] Document
+  - [x] Fetch
+  - [ ] Create
+  - [ ] Fetch content
+- [ ] IINS
+- [ ] Invoice
+  - [x] Create
+  - [ ] Update
+  - [ ] Issue
+  - [ ] Delete
+  - [ ] Cancel
+  - [ ] Fetch
+  - [ ] List
+  - [ ] Send notification
 - [x] Item
+- [x] Line items
+- [x] Offer
 - [x] Order
 - [x] Payment
+- [x] Payment downtime
 - [ ] Payment link
 - [x] Plan
 - [ ] Product
 - [ ] QR Code
 - [x] Refund
 - [x] Settlement
+- [x] Instant settlement
 - [ ] Stakeholders
 - [x] Subscription
 - [ ] Token
