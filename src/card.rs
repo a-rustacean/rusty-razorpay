@@ -18,7 +18,12 @@ pub enum CardNetwork {
     AmericanExpress,
     #[serde(rename = "Diners Club")]
     DinersClub,
+    #[serde(rename = "Bajaj Finserv")]
+    BajajFinserv,
     Maestro,
+    JCB,
+    #[serde(rename = "Union Pay")]
+    UnionPay,
     #[serde(rename = "unknown")]
     Unknown,
 }
@@ -44,6 +49,7 @@ pub enum CardType {
 pub enum CardSubType {
     Customer,
     Business,
+    Unknown,
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
