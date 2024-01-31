@@ -13,51 +13,208 @@ rusty-razorpay = "0.2.5"
 ## Progress
 
 - [ ] Account
-  - [x] Create
-  - [x] Fetch
-  - [x] Delete
-  - [ ] Update
+  - [x] Types
+  - [ ] APIs
+    - [x] Create
+    - [x] Fetch
+    - [ ] Update
+    - [x] Delete
 - [x] Addon
+  - [x] Types
+  - [x] APIs
+    - [x] Create
+    - [x] Fetch
+    - [x] Delete
+    - [x] List
 - [x] Address
+  - [x] Types
 - [ ] Card
-  - [x] Fetch
-  - [ ] Fingerprint
+  - [x] Types
+  - [ ] APIs
+    - [x] Fetch
+    - [ ] Fingerprint
 - [x] Customer
+  - [x] Types
+  - [x] APIs
+    - [x] Create
+    - [x] Fetch
+    - [x] Update
+    - [x] List
 - [ ] Fund account
+  - [ ] Types
+  - [ ] APIs
+    - [ ] Create
+    - [ ] Fetch
 - [x] Dispute
+  - [x] Types
+  - [x] APIs
+    - [x] Fetch
+    - [x] Accept
+    - [x] Contest
+    - [x] List
 - [ ] Document
-  - [x] Fetch
-  - [ ] Create
-  - [ ] Fetch content
+  - [x] Types
+  - [ ] APIs
+    - [x] Fetch
+    - [ ] Create
+    - [ ] Fetch content
 - [ ] IINS
+  - [ ] Types
+  - [ ] APIs
+    - [ ] Fetch
 - [ ] Invoice
-  - [x] Create
-  - [ ] Update
-  - [ ] Issue
-  - [ ] Delete
-  - [ ] Cancel
-  - [ ] Fetch
-  - [ ] List
-  - [ ] Send notification
+  - [x] Types
+  - [ ] APIs
+    - [x] Create
+    - [ ] Fetch
+    - [ ] Update
+    - [ ] Issue
+    - [ ] Delete
+    - [ ] Cancel
+    - [ ] List
+    - [ ] Send notification
 - [x] Item
+  - [x] Types
+  - [x] APIs
+    - [x] Create
+    - [x] Fetch
+    - [x] Update
+    - [x] Delete
+    - [x] List
 - [x] Line items
+  - [x] Types
 - [x] Offer
+  - [x] Types
 - [x] Order
+  - [x] Types
+  - [x] APIs
+    - [x] Create
+    - [x] Fetch
+    - [x] Update
+    - [x] List
+    - [x] List payments
 - [x] Payment
+  - [x] Types
+  - [x] APIs
+    - [x] Capture
+    - [x] Fetch
+    - [x] Fetch card
+    - [x] Fetch refund
+    - [x] Update
+    - [x] Refund
+    - [x] List
+    - [x] List refunds
 - [x] Payment downtime
+  - [x] Types
+  - [x] APIs
+    - [x] Fetch
+    - [x] List
 - [ ] Payment link
+  - [ ] Types
+  - [ ] APIs
+    - [ ] Create
+    - [ ] Fetch
+    - [ ] Update
+    - [ ] Notify
+    - [ ] Cancel
+    - [ ] List
 - [x] Plan
+  - [x] Types
+  - [x] APIs
+    - [x] Create
+    - [x] Fetch
+    - [x] List
 - [ ] Product
+  - [ ] Types
+  - [ ] APIs
+    - [ ] Create
+    - [ ] Fetch
+    - [ ] Fetch T & C
+    - [ ] Update
 - [ ] QR Code
+  - [ ] Types
+  - [ ] APIs
+    - [ ] Create
+    - [ ] Fetch
+    - [ ] Close
+    - [ ] List
+    - [ ] List payments
 - [x] Refund
+  - [x] Types
+  - [x] APIs
+    - [x] Fetch
+    - [x] Update
+    - [x] List
 - [x] Settlement
+  - [x] Types
+  - [x] APIs
+    - [x] Fetch
+    - [x] Fetch recon
+    - [x] List
 - [x] Instant settlement
+  - [x] Types
+  - [x] APIs
+    - [x] Create
+    - [x] Fetch
+    - [x] List
 - [ ] Stakeholders
+  - [ ] Types
+  - [ ] APIs
+    - [ ] Create
+    - [ ] Fetch
+    - [ ] Fetch documents
+    - [ ] Update
+    - [ ] Update documents
+    - [ ] List
 - [x] Subscription
+  - [x] Types
+  - [x] APIs
+    - [x] Create
+    - [x] Fetch
+    - [x] Fetch pending update
+    - [x] Update
+    - [x] Cancel
+    - [x] Cancel scheduled update
+    - [x] Pause
+    - [x] Resume
+    - [x] List
 - [ ] Token
+  - [ ] Types
+  - [ ] APIs
+    - [ ] Create
+    - [ ] Fetch
+    - [ ] Delete
+    - [ ] Process payment on alternate PA or PG
 - [ ] Transfer
+  - [ ] Types
+  - [ ] APIs
+    - [ ] Create
+    - [ ] Fetch
+    - [ ] Fetch settlement
+    - [ ] Update
+    - [ ] Reverse
+    - [ ] List
 - [ ] Virtual account
+  - [ ] Types
+  - [ ] APIs
+    - [ ] Create
+    - [ ] Fetch
+    - [ ] Fetch payments
+    - [ ] Add receiver
+    - [ ] Add allowed payer
+    - [ ] Delete allowed payer
+    - [ ] Close
+    - [ ] List
 - [x] Webhook
+  - [x] Types
+  - [ ] APIs
+    - [ ] Create
+    - [ ] Fetch
+    - [ ] Update
+    - [ ] Delete
+    - [ ] List
+  - [x] Utility methods
+    - [x] Construct event
 
 ## Important Notice
 
