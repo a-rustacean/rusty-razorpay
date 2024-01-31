@@ -274,7 +274,7 @@ pub enum WebhookPayloadItem {
     Dispute(Dispute),
     Invoice(Invoice),
     Subscription(Subscription),
-    // TODO: Add missing webhook payload item
+    // TODO: Add missing webhook payload items
     //
     // the following items need to be implemented, the workaround for now is
     // the `Other` variant
