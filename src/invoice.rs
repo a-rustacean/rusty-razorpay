@@ -7,15 +7,20 @@ use crate::{
     ids::CustomerId,
     line_item::LineItem,
     util::{deserialize_notes, serialize_bool_as_int_option},
-    InvoiceId, OrderId, PaymentId, Razorpay,
+    Collection, InvoiceId, OrderId, PaymentId, Razorpay,
 };
 #[cfg(not(feature = "std"))]
-use alloc::{borrow::ToOwned, string::String, vec::Vec};
+use alloc::{borrow::ToOwned, format, string::String, vec::Vec};
 use chrono::{
     serde::{ts_seconds, ts_seconds_option},
     DateTime, Utc,
 };
+#[cfg(not(feature = "std"))]
+use core::fmt::{Display, Formatter, Result as FormatterResult};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
+#[cfg(feature = "std")]
+use std::fmt::{Display, Formatter, Result as FormatterResult};
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -94,7 +99,7 @@ pub struct Invoice {
 
 #[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
-pub enum CreateInvoiceType {
+pub enum CreateOrUpdateInvoiceType {
     #[default]
     Invoice,
 }
@@ -111,7 +116,7 @@ pub struct CreateInvoiceCustomerAddress<'a> {
 }
 
 #[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
-pub struct CreateInvoiceCustomer<'a> {
+pub struct CreateOrUpdateInvoiceCustomer<'a> {
     pub name: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<&'a str>,
@@ -124,7 +129,7 @@ pub struct CreateInvoiceCustomer<'a> {
 }
 
 #[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
-pub struct CreateInvoiceLineItem<'a> {
+pub struct CreateOrUpdateInvoiceLineItem<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub item_id: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -142,7 +147,7 @@ pub struct CreateInvoiceLineItem<'a> {
 #[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
 pub struct CreateInvoice<'a> {
     #[serde(rename = "type")]
-    pub type_: CreateInvoiceType,
+    pub type_: CreateOrUpdateInvoiceType,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<&'a str>,
     #[serde(
@@ -153,9 +158,9 @@ pub struct CreateInvoice<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub customer_id: Option<&'a CustomerId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub customer: Option<CreateInvoiceCustomer<'a>>,
+    pub customer: Option<CreateOrUpdateInvoiceCustomer<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub line_items: Option<Vec<CreateInvoiceLineItem<'a>>>,
+    pub line_items: Option<Vec<CreateOrUpdateInvoiceLineItem<'a>>>,
     #[serde(
         skip_serializing_if = "Option::is_none",
         with = "ts_seconds_option"
@@ -179,6 +184,77 @@ pub struct CreateInvoice<'a> {
     pub notes: Option<Object>,
 }
 
+#[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
+pub struct UpdateInvoice<'a> {
+    #[serde(rename = "type")]
+    pub type_: CreateOrUpdateInvoiceType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<&'a str>,
+    #[serde(
+        serialize_with = "serialize_bool_as_int_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub draft: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub customer_id: Option<&'a CustomerId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub customer: Option<CreateOrUpdateInvoiceCustomer<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub line_items: Option<Vec<CreateOrUpdateInvoiceLineItem<'a>>>,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        with = "ts_seconds_option"
+    )]
+    pub expire_by: Option<DateTime<Utc>>,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_bool_as_int_option"
+    )]
+    pub sms_notify: Option<bool>,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_bool_as_int_option"
+    )]
+    pub email_notify: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub partial_payment: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency: Option<Currency>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<Object>,
+}
+
+#[derive(Debug, Default, Serialize, Clone, Eq, PartialEq)]
+pub struct ListInvoices<'a> {
+    pub payment_id: Option<&'a PaymentId>,
+    pub receipt: Option<&'a str>,
+    pub customer_id: Option<&'a CustomerId>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum InvoiceNotifyMedium {
+    Sms,
+    Email,
+}
+
+impl Display for InvoiceNotifyMedium {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatterResult {
+        write!(
+            f,
+            "{}",
+            match self {
+                InvoiceNotifyMedium::Sms => "sms",
+                InvoiceNotifyMedium::Email => "email",
+            }
+        )
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct InvoiceNotifyResult {
+    success: bool,
+}
+
 impl Invoice {
     pub async fn create(
         razorpay: &Razorpay,
@@ -195,6 +271,144 @@ impl Invoice {
 
         match res {
             InternalApiResult::Ok(invoice) => Ok(invoice),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn update(
+        razorpay: &Razorpay,
+        invoice_id: &InvoiceId,
+        params: UpdateInvoice<'_>,
+    ) -> RazorpayResult<Invoice> {
+        let res = razorpay
+            .api
+            .patch(RequestParams {
+                url: format!("/invoices/{}", invoice_id),
+                version: None,
+                data: Some(params),
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(invoice) => Ok(invoice),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn issue(
+        razorpay: &Razorpay,
+        invoice_id: &InvoiceId,
+    ) -> RazorpayResult<Invoice> {
+        let res = razorpay
+            .api
+            .post(RequestParams {
+                url: format!("/invoices/{}/issue", invoice_id),
+                version: None,
+                data: None::<()>,
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(invoice) => Ok(invoice),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn delete(
+        razorpay: &Razorpay,
+        invoice_id: &InvoiceId,
+    ) -> RazorpayResult<()> {
+        let res: InternalApiResult<Value> = razorpay
+            .api
+            .delete(RequestParams {
+                url: format!("/invoices/{}", invoice_id),
+                version: None,
+                data: None::<()>,
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(_) => Ok(()),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn cancel(
+        razorpay: &Razorpay,
+        invoice_id: &InvoiceId,
+    ) -> RazorpayResult<Invoice> {
+        let res = razorpay
+            .api
+            .post(RequestParams {
+                url: format!("/invoices/{}/cancel", invoice_id),
+                version: None,
+                data: None::<()>,
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(invoice) => Ok(invoice),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn fetch(
+        razorpay: &Razorpay,
+        invoice_id: &InvoiceId,
+    ) -> RazorpayResult<Invoice> {
+        let res = razorpay
+            .api
+            .get(RequestParams {
+                url: format!("/invoices/{}", invoice_id),
+                version: None,
+                data: None::<()>,
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(invoice) => Ok(invoice),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn list<T>(
+        razorpay: &Razorpay,
+        params: T,
+    ) -> RazorpayResult<Collection<Invoice>>
+    where
+        T: for<'a> Into<Option<ListInvoices<'a>>>,
+    {
+        let res = razorpay
+            .api
+            .get(RequestParams {
+                url: "/invoices".to_owned(),
+                version: None,
+                data: params.into(),
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(invoice) => Ok(invoice),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn notify(
+        razorpay: &Razorpay,
+        invoice_id: &InvoiceId,
+        medium: InvoiceNotifyMedium,
+    ) -> RazorpayResult<bool> {
+        let res: InternalApiResult<InvoiceNotifyResult> = razorpay
+            .api
+            .post(RequestParams {
+                url: format!("/invoices/{}/notify_by/{}", invoice_id, medium),
+                version: None,
+                data: None::<()>,
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(res) => Ok(res.success),
             InternalApiResult::Err { error } => Err(error.into()),
         }
     }
