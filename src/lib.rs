@@ -17,6 +17,7 @@ pub mod customer;
 pub mod dispute;
 pub mod document;
 pub mod error;
+pub mod iin;
 pub mod invoice;
 pub mod item;
 pub mod line_item;

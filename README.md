@@ -58,13 +58,10 @@ rusty-razorpay = "0.2.5"
     - [x] Fetch
     - [ ] Create
     - [ ] Fetch content
-- [ ] IINS
-  - [ ] Types
-  - [ ] APIs
-    - [ ] Fetch
-- [ ] Invoice
+- [x] IIN
   - [x] Types
-  - [ ] APIs
+  - [x] APIs
+    - [x] Fetch
     - [x] Create
     - [ ] Fetch
     - [ ] Update

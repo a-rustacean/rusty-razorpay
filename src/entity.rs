@@ -84,6 +84,7 @@ impl std::error::Error for EntityMismatch {
     }
 }
 
+def_entity!(InnEntity, "inn");
 def_entity!(CardEntity, "card");
 def_entity!(PlanEntity, "plan");
 def_entity!(OrderEntity, "order");
