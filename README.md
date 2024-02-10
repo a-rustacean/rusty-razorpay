@@ -207,12 +207,12 @@ rusty-razorpay = "0.2.5"
     - [ ] List
 - [x] Webhook
   - [x] Types
-  - [ ] APIs
-    - [ ] Create
-    - [ ] Fetch
-    - [ ] Update
-    - [ ] Delete
-    - [ ] List
+  - [x] APIs
+    - [x] Create
+    - [x] Fetch
+    - [x] Update
+    - [x] Delete
+    - [x] List
   - [x] Utility methods
     - [x] Construct event
 

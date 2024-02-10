@@ -1,16 +1,28 @@
 use crate::{
-    account::Account, dispute::Dispute, entity::WebhookEntity,
-    invoice::Invoice, order::Order, payment::Payment, refund::Refund,
-    subscription::Subscription, util::generate_webhook_signature,
+    account::Account,
+    api::RequestParams,
+    dispute::Dispute,
+    entity::{WebhookEntity, WebhookEventEntity},
+    error::{InternalApiResult, RazorpayResult},
+    invoice::Invoice,
+    order::Order,
+    payment::Payment,
+    refund::Refund,
+    subscription::Subscription,
+    util::generate_webhook_signature,
+    AccountId, Collection, Filter, Razorpay,
 };
 #[cfg(not(feature = "std"))]
-use alloc::{string::String, vec::Vec};
-use chrono::{serde::ts_seconds, DateTime, Utc};
+use alloc::{borrow::ToOwned, format, string::String, vec::Vec};
+use chrono::{
+    serde::{ts_seconds, ts_seconds_option},
+    DateTime, Utc,
+};
 #[cfg(not(feature = "std"))]
 use core::fmt::{Display, Formatter, Result as FormatterResult};
 #[cfg(not(feature = "std"))]
 use hashbrown::HashMap;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 #[cfg(feature = "std")]
 use std::{
@@ -44,8 +56,8 @@ impl From<serde_json::error::Error> for WebhookError {
     }
 }
 
-#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
-pub enum WebhookEvent {
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
+pub enum EventType {
     // Payment events
     #[serde(rename = "payment.authorized")]
     PaymentAuthorized,
@@ -324,11 +336,12 @@ pub struct WebhookPayload {
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
-pub struct Webhook {
+pub struct WebhookEvent {
     #[serde(default)]
-    pub entity: WebhookEntity,
+    pub entity: WebhookEventEntity,
     pub account_id: String,
-    pub event: WebhookEvent,
+    #[serde(rename = "event")]
+    pub type_: EventType,
     pub contains: Vec<WebhookPayloadItemName>,
     #[serde(default)]
     pub payload: HashMap<WebhookPayloadItemName, WebhookPayload>,
@@ -336,17 +349,171 @@ pub struct Webhook {
     pub created_at: DateTime<Utc>,
 }
 
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum WebhookOwnerType {
+    Merchant,
+}
+
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
+pub struct Webhook {
+    pub id: String,
+    #[serde(with = "ts_seconds")]
+    pub created_at: DateTime<Utc>,
+    #[serde(with = "ts_seconds_option")]
+    pub updated_at: Option<DateTime<Utc>>,
+    pub owner_id: AccountId,
+    pub owner_type: WebhookOwnerType,
+    pub url: String,
+    pub secret: Option<String>,
+    pub alert_email: Option<String>,
+    #[serde(default)]
+    pub secret_exists: bool,
+    pub entity: WebhookEntity,
+    pub active: bool,
+    pub events: Vec<EventType>,
+}
+
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct CreateWebhook<'a> {
+    pub url: &'a str,
+    pub alert_email: Option<&'a str>,
+    pub secret: Option<&'a str>,
+    pub events: &'a [EventType],
+}
+
+#[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
+pub struct UpdateWebhook<'a> {
+    pub url: Option<&'a str>,
+    pub events: &'a [EventType],
+}
+
 impl Webhook {
+    // utility method
     pub fn construct_event(
         payload: &str,
         sig: &str,
         secret: &str,
-    ) -> Result<Webhook, WebhookError> {
+    ) -> Result<WebhookEvent, WebhookError> {
         let expected_sig = generate_webhook_signature(payload, secret);
         if sig != expected_sig {
             return Err(WebhookError::BadSignature);
         }
 
         Ok(serde_json::from_str(payload)?)
+    }
+
+    // APIs
+    pub async fn create(
+        razorpay: &Razorpay,
+        account_id: &AccountId,
+        params: CreateWebhook<'_>,
+    ) -> RazorpayResult<Webhook> {
+        let res = razorpay
+            .api
+            .post(RequestParams {
+                url: format!("/accounts/{}/webhooks", account_id),
+                version: Some("v2".to_owned()),
+                data: Some(params),
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(webhook) => Ok(webhook),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn fetch(
+        razorpay: &Razorpay,
+        account_id: &AccountId,
+        webhook_id: &str,
+    ) -> RazorpayResult<Webhook> {
+        let res = razorpay
+            .api
+            .get(RequestParams {
+                url: format!(
+                    "/accounts/{}/webhooks/{}",
+                    account_id, webhook_id
+                ),
+                version: None,
+                data: None::<()>,
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(webhook) => Ok(webhook),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn list<T>(
+        razorpay: &Razorpay,
+        account_id: &AccountId,
+        params: T,
+    ) -> RazorpayResult<Collection<Webhook>>
+    where
+        T: Into<Option<Filter>>,
+    {
+        let res = razorpay
+            .api
+            .get(RequestParams {
+                url: format!("/accounts/{}/webhooks", account_id),
+                version: Some("v2".to_owned()),
+                data: params.into(),
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(webhooks) => Ok(webhooks),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn update(
+        razorpay: &Razorpay,
+        account_id: &AccountId,
+        webhook_id: &str,
+        params: UpdateWebhook<'_>,
+    ) -> RazorpayResult<Webhook> {
+        let res = razorpay
+            .api
+            .patch(RequestParams {
+                url: format!(
+                    "/accounts/{}/webhooks/{}",
+                    account_id, webhook_id
+                ),
+                version: Some("v2".to_owned()),
+                data: Some(params),
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(webhook) => Ok(webhook),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
+    }
+
+    pub async fn delete(
+        razorpay: &Razorpay,
+        account_id: &AccountId,
+        webhook_id: &str,
+    ) -> RazorpayResult<()> {
+        let res: InternalApiResult<Value> = razorpay
+            .api
+            .delete(RequestParams {
+                url: format!(
+                    "/accounts/{}/webhooks/{}",
+                    account_id, webhook_id
+                ),
+                version: Some("v2".to_owned()),
+                data: None::<()>,
+            })
+            .await?;
+
+        match res {
+            InternalApiResult::Ok(_) => Ok(()),
+            InternalApiResult::Err { error } => Err(error.into()),
+        }
     }
 }
