@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.3.0
+
+- complete webhook APIs
+- add IIN APIs
+- complete account APIs
+- complete invoice APIs
+
+**Full Changelog**: [v0.2.5...v0.3.0](https://github.com/a-rustacean/rusty-razorpay/compare/v0.2.5...v0.3.0)
+
 ## v0.2.5
 
 - implement `std::error::Error` for `ParseIdError` in std feature

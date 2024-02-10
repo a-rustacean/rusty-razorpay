@@ -6,7 +6,8 @@ The following versions are supported and are being tracked for vulnerabilities:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| v0.2.5  | :white_check_mark: |
+| v0.3.0  | :white_check_mark: |
+| v0.2.5  | :x:                |
 | v0.2.4  | :x:                |
 | v0.2.3  | :x:                |
 | v0.2.2  | :x:                |
