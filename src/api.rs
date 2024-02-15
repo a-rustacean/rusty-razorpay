@@ -1,11 +1,13 @@
-use crate::error::RazorpayResult;
 #[cfg(not(feature = "std"))]
 use alloc::{
     borrow::ToOwned, format, string::String, string::ToString, vec, vec::Vec,
 };
+
 use reqwest::{header::HeaderMap, Client, ClientBuilder};
 use serde::{de::DeserializeOwned, ser::Error, Serialize};
 use serde_json::{to_value, Value};
+
+use crate::error::RazorpayResult;
 
 #[derive(Debug)]
 pub struct Api {
@@ -59,7 +61,8 @@ where
                         Value::Number(n) => n.to_string(),
                         _ => {
                             return Err(serde_json::Error::custom(
-                                "Unsupported value in vec, cannot serialize nested map and vec",
+                                "Unsupported value in vec, cannot serialize \
+                                 nested map and vec",
                             ))
                         }
                     };

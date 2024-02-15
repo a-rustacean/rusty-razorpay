@@ -1,12 +1,14 @@
+#[cfg(not(feature = "std"))]
+use alloc::{format, string::String, vec::Vec};
+
+use serde::Deserialize;
+
 use crate::{
     api::RequestParams,
     card::{CardNetwork, CardSubType, CardTypeExtended},
     error::{InternalApiResult, RazorpayResult},
     Razorpay,
 };
-#[cfg(not(feature = "std"))]
-use alloc::{format, string::String, vec::Vec};
-use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub enum InnAuthenticationType {

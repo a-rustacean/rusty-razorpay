@@ -1,3 +1,13 @@
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, format, string::String};
+
+use chrono::{
+    serde::{ts_seconds, ts_seconds_option},
+    DateTime, Utc,
+};
+use serde::{Deserialize, Serialize};
+use serde_json::json;
+
 use crate::{
     api::RequestParams,
     card::{Card, CardType},
@@ -9,14 +19,6 @@ use crate::{
     util::deserialize_notes,
     Razorpay,
 };
-#[cfg(not(feature = "std"))]
-use alloc::{borrow::ToOwned, format, string::String};
-use chrono::{
-    serde::{ts_seconds, ts_seconds_option},
-    DateTime, Utc,
-};
-use serde::{Deserialize, Serialize};
-use serde_json::json;
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]

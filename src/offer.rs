@@ -1,5 +1,6 @@
-use crate::ids::OfferId;
 use serde::Deserialize;
+
+use crate::ids::OfferId;
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct Offer {

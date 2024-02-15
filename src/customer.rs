@@ -1,3 +1,9 @@
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, format, string::String};
+
+use chrono::{serde::ts_seconds, DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
 use crate::{
     api::RequestParams,
     common::{Collection, Object},
@@ -6,10 +12,6 @@ use crate::{
     util::{deserialize_notes, serialize_bool_as_int_option},
     Razorpay,
 };
-#[cfg(not(feature = "std"))]
-use alloc::{borrow::ToOwned, format, string::String};
-use chrono::{serde::ts_seconds, DateTime, Utc};
-use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct Customer {

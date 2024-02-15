@@ -1,13 +1,15 @@
+#[cfg(not(feature = "std"))]
+use alloc::{format, string::String};
+
+use chrono::{serde::ts_seconds, DateTime, Utc};
+use serde::Deserialize;
+
 use crate::{
     api::RequestParams,
     error::{InternalApiResult, RazorpayResult},
     ids::DocumentId,
     Razorpay,
 };
-#[cfg(not(feature = "std"))]
-use alloc::{format, string::String};
-use chrono::{serde::ts_seconds, DateTime, Utc};
-use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]

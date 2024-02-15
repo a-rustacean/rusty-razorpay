@@ -1,3 +1,17 @@
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, format, string::String, vec::Vec};
+#[cfg(not(feature = "std"))]
+use core::fmt::{Display, Formatter, Result as FormatterResult};
+#[cfg(feature = "std")]
+use std::fmt::{Display, Formatter, Result as FormatterResult};
+
+use chrono::{
+    serde::{ts_seconds, ts_seconds_option},
+    DateTime, Utc,
+};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
 use crate::{
     address::Address,
     api::RequestParams,
@@ -8,18 +22,6 @@ use crate::{
     util::{deserialize_notes, serialize_bool_as_int_option},
     Collection, InvoiceId, OrderId, PaymentId, Razorpay,
 };
-#[cfg(not(feature = "std"))]
-use alloc::{borrow::ToOwned, format, string::String, vec::Vec};
-use chrono::{
-    serde::{ts_seconds, ts_seconds_option},
-    DateTime, Utc,
-};
-#[cfg(not(feature = "std"))]
-use core::fmt::{Display, Formatter, Result as FormatterResult};
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
-#[cfg(feature = "std")]
-use std::fmt::{Display, Formatter, Result as FormatterResult};
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]

@@ -1,7 +1,9 @@
-use crate::AddressId;
 #[cfg(not(feature = "std"))]
 use alloc::string::String;
+
 use serde::{Deserialize, Serialize};
+
+use crate::AddressId;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub enum AddressType {

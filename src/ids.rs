@@ -12,7 +12,6 @@ use core::{
     ops::Deref,
     str::FromStr,
 };
-use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
 #[cfg(feature = "std")]
 use std::{
     cmp::{Ordering, PartialOrd},
@@ -20,6 +19,8 @@ use std::{
     ops::Deref,
     str::FromStr,
 };
+
+use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
 
 macro_rules! def_id_serde_impls {
     ($struct_name:ident) => {

@@ -1,6 +1,7 @@
-use crate::api::{Api, ApiOptions};
 #[cfg(not(feature = "std"))]
 use alloc::{borrow::ToOwned, format, string::String};
+
+use crate::api::{Api, ApiOptions};
 
 const BASE_URL: &str = "https://api.razorpay.com";
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

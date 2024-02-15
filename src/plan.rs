@@ -1,3 +1,9 @@
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, format};
+
+use chrono::{serde::ts_seconds, DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
 use crate::{
     api::RequestParams,
     common::{Collection, Currency, Filter, Object},
@@ -7,10 +13,6 @@ use crate::{
     util::deserialize_notes,
     Razorpay,
 };
-#[cfg(not(feature = "std"))]
-use alloc::{borrow::ToOwned, format};
-use chrono::{serde::ts_seconds, DateTime, Utc};
-use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Serialize, Clone, PartialEq, Eq)]
 pub struct CreatePlanItem<'a> {

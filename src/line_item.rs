@@ -1,7 +1,9 @@
-use crate::{common::Currency, LineItemId};
 #[cfg(not(feature = "std"))]
 use alloc::string::String;
+
 use serde::Deserialize;
+
+use crate::{common::Currency, LineItemId};
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]

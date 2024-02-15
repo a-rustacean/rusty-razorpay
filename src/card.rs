@@ -1,12 +1,14 @@
+#[cfg(not(feature = "std"))]
+use alloc::{format, string::String};
+
+use serde::Deserialize;
+
 use crate::{
     api::RequestParams,
     error::{InternalApiResult, RazorpayResult},
     ids::CardId,
     Razorpay,
 };
-#[cfg(not(feature = "std"))]
-use alloc::{format, string::String};
-use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub enum CardNetwork {

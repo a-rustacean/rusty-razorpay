@@ -1,3 +1,12 @@
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, format, string::String, vec::Vec};
+
+use chrono::{
+    serde::{ts_seconds, ts_seconds_option},
+    DateTime, Utc,
+};
+use serde::{Deserialize, Serialize};
+
 use crate::{
     api::RequestParams,
     common::{Collection, Currency},
@@ -5,13 +14,6 @@ use crate::{
     ids::DisputeId,
     PaymentId, Razorpay,
 };
-#[cfg(not(feature = "std"))]
-use alloc::{borrow::ToOwned, format, string::String, vec::Vec};
-use chrono::{
-    serde::{ts_seconds, ts_seconds_option},
-    DateTime, Utc,
-};
-use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]

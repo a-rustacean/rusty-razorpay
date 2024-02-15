@@ -1,3 +1,22 @@
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, format, string::String, vec::Vec};
+#[cfg(not(feature = "std"))]
+use core::fmt::{Display, Formatter, Result as FormatterResult};
+#[cfg(feature = "std")]
+use std::{
+    collections::HashMap,
+    fmt::{Display, Formatter, Result as FormatterResult},
+};
+
+use chrono::{
+    serde::{ts_seconds, ts_seconds_option},
+    DateTime, Utc,
+};
+#[cfg(not(feature = "std"))]
+use hashbrown::HashMap;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
 use crate::{
     account::Account,
     api::RequestParams,
@@ -10,23 +29,6 @@ use crate::{
     subscription::Subscription,
     util::generate_webhook_signature,
     AccountId, Collection, Filter, Razorpay,
-};
-#[cfg(not(feature = "std"))]
-use alloc::{borrow::ToOwned, format, string::String, vec::Vec};
-use chrono::{
-    serde::{ts_seconds, ts_seconds_option},
-    DateTime, Utc,
-};
-#[cfg(not(feature = "std"))]
-use core::fmt::{Display, Formatter, Result as FormatterResult};
-#[cfg(not(feature = "std"))]
-use hashbrown::HashMap;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
-#[cfg(feature = "std")]
-use std::{
-    collections::HashMap,
-    fmt::{Display, Formatter, Result as FormatterResult},
 };
 
 #[derive(Debug)]

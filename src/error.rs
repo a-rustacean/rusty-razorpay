@@ -1,14 +1,16 @@
-use crate::{
-    common::Object,
-    util::{debug_option, display_option},
-};
 #[cfg(not(feature = "std"))]
 use alloc::string::String;
 #[cfg(not(feature = "std"))]
 use core::fmt::{Display, Formatter, Result as FormatterResult};
-use serde::Deserialize;
 #[cfg(feature = "std")]
 use std::fmt::{Display, Formatter, Result as FormatterResult};
+
+use serde::Deserialize;
+
+use crate::{
+    common::Object,
+    util::{debug_option, display_option},
+};
 
 #[derive(Debug, Deserialize)]
 pub struct ApiError {
@@ -25,10 +27,16 @@ impl Display for ApiError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FormatterResult {
         write!(
             f,
-            "Razorpay Error: {}: {}\n\nsource: {}\nstep: {}\nreason: {}\nfield: {}\nmetadata: {}",
-            self.code, self.description, display_option(self.source.as_ref()),
-            display_option(self.step.as_ref()), display_option(self.reason.as_ref()),
-            display_option(self.field.as_ref()), debug_option(self.metadata.as_ref()))
+            "Razorpay Error: {}: {}\n\nsource: {}\nstep: {}\nreason: \
+             {}\nfield: {}\nmetadata: {}",
+            self.code,
+            self.description,
+            display_option(self.source.as_ref()),
+            display_option(self.step.as_ref()),
+            display_option(self.reason.as_ref()),
+            display_option(self.field.as_ref()),
+            debug_option(self.metadata.as_ref())
+        )
     }
 }
 
