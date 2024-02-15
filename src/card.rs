@@ -1,6 +1,5 @@
 use crate::{
     api::RequestParams,
-    entity::CardEntity,
     error::{InternalApiResult, RazorpayResult},
     ids::CardId,
     Razorpay,
@@ -53,9 +52,9 @@ pub enum CardSubType {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "card")]
 pub struct Card {
     pub id: CardId,
-    pub entity: CardEntity,
     pub name: String,
     pub last4: String,
     pub network: CardNetwork,

@@ -2,7 +2,6 @@ use crate::{
     addon::Addon,
     api::RequestParams,
     common::{Collection, Currency, Filter, Object},
-    entity::SubscriptionEntity,
     error::{InternalApiResult, RazorpayResult},
     ids::{CustomerId, OfferId, PlanId, SubscriptionId},
     util::{deserialize_notes, serialize_bool_as_int_option},
@@ -129,9 +128,9 @@ pub enum SubscriptionChangeSchedule {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "subscription")]
 pub struct Subscription {
     pub id: SubscriptionId,
-    pub entity: SubscriptionEntity,
     pub plan_id: PlanId,
     pub customer_id: Option<CustomerId>,
     pub total_count: u8,

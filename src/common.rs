@@ -7,8 +7,6 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "std")]
 use std::collections::HashMap;
 
-use crate::entity::CollectionEntity;
-
 #[derive(
     Debug, Serialize, Deserialize, Default, Clone, Copy, PartialEq, Eq,
 )]
@@ -112,8 +110,8 @@ pub enum Currency {
 pub type Object = HashMap<String, String>;
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "collection")]
 pub struct Collection<T> {
-    pub entity: CollectionEntity,
     pub count: usize,
     pub items: Vec<T>,
 }

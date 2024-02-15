@@ -4,7 +4,6 @@
 extern crate alloc;
 
 mod api;
-mod entity;
 mod ids;
 mod razorpay;
 
@@ -33,5 +32,4 @@ pub mod webhook;
 
 pub use common::{Collection, Country, Currency, Filter, Object};
 pub use ids::*;
-
 pub use razorpay::{Razorpay, VERSION};

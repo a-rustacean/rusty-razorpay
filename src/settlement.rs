@@ -2,10 +2,6 @@ use crate::{
     api::RequestParams,
     card::{CardNetwork, CardType},
     common::{Collection, Currency, Filter, Object},
-    entity::{
-        InstantSettlementEntity, InstantSettlementPayoutEntity,
-        SettlementEntity,
-    },
     error::{InternalApiResult, RazorpayResult},
     ids::{InstantSettlementId, InstantSettlementPayoutId, SettlementId},
     payment::PaymentMethod,
@@ -31,9 +27,9 @@ pub enum SettlementStatus {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "settlement")]
 pub struct Settlement {
     pub id: SettlementId,
-    pub entity: SettlementEntity,
     pub amount: u64,
     pub status: SettlementStatus,
     pub fees: u64,
@@ -63,9 +59,9 @@ pub enum InstantSettlementPayoutStatus {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "settlement.ondemand_payout")]
 pub struct InstantSettlementPayout {
     pub id: InstantSettlementPayoutId,
-    pub entity: InstantSettlementPayoutEntity,
     #[serde(with = "ts_seconds")]
     pub initiated_at: DateTime<Utc>,
     #[serde(with = "ts_seconds_option")]
@@ -83,9 +79,9 @@ pub struct InstantSettlementPayout {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "settlement.ondemand")]
 pub struct InstantSettlement {
     pub id: InstantSettlementId,
-    pub entity: InstantSettlementEntity,
     pub amount_requested: u64,
     pub amount_settled: u64,
     pub amount_pending: u64,

@@ -2,7 +2,6 @@ use crate::{
     address::Address,
     api::RequestParams,
     common::{Currency, Object},
-    entity::InvoiceEntity,
     error::{InternalApiResult, RazorpayResult},
     ids::CustomerId,
     line_item::LineItem,
@@ -58,9 +57,9 @@ pub enum InvoiceMessageStatus {
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
+#[serde(tag = "entity", rename = "invoice")]
 pub struct Invoice {
     pub id: InvoiceId,
-    pub entity: InvoiceEntity,
     #[serde(rename = "type")]
     pub type_: InvoiceType,
     pub invoice_number: String,

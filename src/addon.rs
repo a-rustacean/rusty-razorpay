@@ -1,7 +1,6 @@
 use crate::{
     api::RequestParams,
     common::{Collection, Filter},
-    entity::AddonEntity,
     error::{InternalApiResult, RazorpayResult},
     ids::{AddonId, SubscriptionId},
     item::{CreateItem, Item},
@@ -14,9 +13,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "addon")]
 pub struct Addon {
     pub id: AddonId,
-    pub entity: AddonEntity,
     pub item: Item,
     pub quantity: u64,
     #[serde(with = "ts_seconds")]

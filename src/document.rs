@@ -1,6 +1,5 @@
 use crate::{
     api::RequestParams,
-    entity::DocumentEntity,
     error::{InternalApiResult, RazorpayResult},
     ids::DocumentId,
     Razorpay,
@@ -29,9 +28,9 @@ pub enum DocumentMimeType {
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
+#[serde(tag = "entity", rename = "document")]
 pub struct Document {
     pub id: DocumentId,
-    pub entity: DocumentEntity,
     pub purpose: DocumentPurpose,
     pub name: String,
     pub size: u64,

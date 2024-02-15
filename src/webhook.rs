@@ -2,7 +2,6 @@ use crate::{
     account::Account,
     api::RequestParams,
     dispute::Dispute,
-    entity::{WebhookEntity, WebhookEventEntity},
     error::{InternalApiResult, RazorpayResult},
     invoice::Invoice,
     order::Order,
@@ -336,9 +335,8 @@ pub struct WebhookPayload {
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
+#[serde(tag = "entity", rename = "event")]
 pub struct WebhookEvent {
-    #[serde(default)]
-    pub entity: WebhookEventEntity,
     pub account_id: String,
     #[serde(rename = "event")]
     pub type_: EventType,
@@ -356,6 +354,7 @@ pub enum WebhookOwnerType {
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
+#[serde(tag = "entity", rename = "webhook")]
 pub struct Webhook {
     pub id: String,
     #[serde(with = "ts_seconds")]
@@ -369,7 +368,6 @@ pub struct Webhook {
     pub alert_email: Option<String>,
     #[serde(default)]
     pub secret_exists: bool,
-    pub entity: WebhookEntity,
     pub active: bool,
     pub events: Vec<EventType>,
 }

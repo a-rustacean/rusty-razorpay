@@ -1,7 +1,6 @@
 use crate::{
     api::RequestParams,
     common::{Collection, Currency, Filter, Object},
-    entity::RefundEntity,
     error::{InternalApiResult, RazorpayResult},
     ids::RefundId,
     util::deserialize_notes,
@@ -30,9 +29,9 @@ pub enum RefundStatus {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "refund")]
 pub struct Refund {
     pub id: RefundId,
-    pub entity: RefundEntity,
     pub amount: u64,
     pub currency: Currency,
     pub payment_id: PaymentId,

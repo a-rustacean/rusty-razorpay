@@ -2,7 +2,6 @@ use crate::{
     api::RequestParams,
     card::{Card, CardType},
     common::{Collection, Currency, Filter, Object},
-    entity::{DowntimeEntity, PaymentEntity},
     error::{InternalApiResult, RazorpayResult},
     ids::{CardId, DowntimeId, OrderId, PaymentId, RefundId},
     offer::Offer,
@@ -82,9 +81,9 @@ pub struct PaymentEmiInfo {
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
+#[serde(tag = "entity", rename = "payment")]
 pub struct Payment {
     pub id: PaymentId,
-    pub entity: PaymentEntity,
     pub amount: u64,
     pub currency: Currency,
     pub status: PaymentStatus,
@@ -237,9 +236,9 @@ pub enum DowntimeFlow {
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
+#[serde(tag = "entity", rename = "payment.downtime")]
 pub struct Downtime {
     pub id: DowntimeId,
-    pub entity: DowntimeEntity,
     pub method: DowntimeMethod,
     #[serde(with = "ts_seconds")]
     pub begin: DateTime<Utc>,

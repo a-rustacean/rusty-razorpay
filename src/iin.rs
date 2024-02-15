@@ -1,7 +1,6 @@
 use crate::{
     api::RequestParams,
     card::{CardNetwork, CardSubType, CardTypeExtended},
-    entity::InnEntity,
     error::{InternalApiResult, RazorpayResult},
     Razorpay,
 };
@@ -33,9 +32,9 @@ pub struct InnRecurringOptions {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "entity")]
 pub struct Inn {
     pub inn: String,
-    pub entity: InnEntity,
     pub network: CardNetwork,
     #[serde(rename = "type")]
     pub type_: CardTypeExtended,

@@ -1,7 +1,6 @@
 use crate::{
     api::RequestParams,
     common::{Collection, Currency},
-    entity::DisputeEntity,
     error::{InternalApiResult, RazorpayResult},
     ids::DisputeId,
     PaymentId, Razorpay,
@@ -61,9 +60,9 @@ pub struct DisputeEvidence {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "dispute")]
 pub struct Dispute {
     pub id: DisputeId,
-    pub entity: DisputeEntity,
     pub payment_id: PaymentId,
     pub amount: u64,
     pub currency: Currency,

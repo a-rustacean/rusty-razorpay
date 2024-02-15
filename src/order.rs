@@ -1,7 +1,6 @@
 use crate::{
     api::RequestParams,
     common::{Collection, Currency, Filter, Object},
-    entity::OrderEntity,
     error::{InternalApiResult, RazorpayResult},
     ids::OrderId,
     payment::Payment,
@@ -68,9 +67,9 @@ pub enum OrderStatus {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "order")]
 pub struct Order {
     pub id: OrderId,
-    pub entity: OrderEntity,
     pub amount: u64,
     pub partial_payment: Option<bool>,
     pub amount_paid: u64,

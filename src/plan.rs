@@ -1,7 +1,6 @@
 use crate::{
     api::RequestParams,
     common::{Collection, Currency, Filter, Object},
-    entity::PlanEntity,
     error::{InternalApiResult, RazorpayResult},
     ids::PlanId,
     item::Item,
@@ -52,9 +51,9 @@ pub enum PlanPeriod {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "entity", rename = "plan")]
 pub struct Plan {
     pub id: PlanId,
-    pub entity: PlanEntity,
     pub interval: u8,
     pub period: PlanPeriod,
     pub item: Item,
