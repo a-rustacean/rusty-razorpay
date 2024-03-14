@@ -14,7 +14,7 @@ use core::{
 };
 #[cfg(feature = "std")]
 use std::{
-    cmp::{Ordering, PartialOrd},
+    cmp::Ordering,
     fmt::{Display, Formatter, Result as FormatterResult},
     ops::Deref,
     str::FromStr,
