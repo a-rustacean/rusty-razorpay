@@ -51,7 +51,8 @@ pub enum PaymentRefundStatus {
 pub struct PaymentAcquirerData {
     pub rrn: String,
     pub authentication_reference_number: Option<String>,
-    pub bank_transaction_id: String,
+    pub bank_transaction_id: Option<String>,
+    pub auth_code: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
