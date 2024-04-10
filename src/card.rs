@@ -50,6 +50,7 @@ pub enum CardType {
 pub enum CardSubType {
     Customer,
     Business,
+    Consumer,
     Unknown,
 }
 
