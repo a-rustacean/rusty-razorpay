@@ -7,7 +7,7 @@ Rusty Razorpay is an unofficial Rust SDK for Razorpay, currently a work in progr
 To use Rusty Razorpay in your project, add the following line to your `Cargo.toml` file:
 
 ```toml
-rusty-razorpay = "0.3.0"
+rusty-razorpay = "0.3.1"
 ```
 
 ## Progress

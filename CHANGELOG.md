@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.3.1
+
+- Add `consumer` card sub-type
+- Make `vpa` optional in `Payment`
+- Update `PaymentAcquirerData`
+- Use serde tag for entity type validation
+
+**Full Changelog**: [v0.3.0...v0.3.1](https://github.com/a-rustacean/rusty-razorpay/compare/v0.3.0...v0.3.1)
+
 ## v0.3.0
 
 - complete webhook APIs
