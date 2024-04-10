@@ -110,7 +110,7 @@ pub struct Payment {
     pub acquirer_data: Option<PaymentAcquirerData>,
     pub bank: Option<String>,
     pub upi: Option<PaymentUpiInfo>,
-    pub vpa: String,
+    pub vpa: Option<String>,
     pub emi: Option<PaymentEmiInfo>,
     pub offers: Option<Collection<Offer>>,
     pub error_code: Option<String>,
