@@ -110,6 +110,13 @@ pub enum Currency {
 
 pub type Object = HashMap<String, String>;
 
+#[macro_export(local_inner_macros)]
+macro_rules! obj {
+    ($($key:literal: $value:expr),* $(,)?) => {
+        $crate::Object::from([$((String::from($key), String::from($value))),*])
+    };
+}
+
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(tag = "entity", rename = "collection")]
 pub struct Collection<T> {
