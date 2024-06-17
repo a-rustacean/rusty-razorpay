@@ -301,19 +301,16 @@ impl Payment {
         }
     }
 
-    pub async fn list<T>(
+    pub async fn list(
         razorpay: &Razorpay,
-        params: T,
-    ) -> RazorpayResult<Collection<Payment>>
-    where
-        T: for<'a> Into<Option<ListPayments<'a>>>,
-    {
+        params: Option<ListPayments<'_>>,
+    ) -> RazorpayResult<Collection<Payment>> {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/payments".to_owned(),
                 version: None,
-                data: params.into(),
+                data: params,
             })
             .await?;
 
