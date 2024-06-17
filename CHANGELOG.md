@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.3.2
+
+- Add `obj` macro for creating `Object`s
+- Bump dependencies' version
+
+**Full Changelog**: [v0.3.1...v0.3.2](https://github.com/a-rustacean/rusty-razorpay/compare/v0.3.1...v0.3.2)
+
 ## v0.3.1
 
 - Add `consumer` card sub-type
