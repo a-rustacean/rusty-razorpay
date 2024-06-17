@@ -372,19 +372,16 @@ impl Invoice {
         }
     }
 
-    pub async fn list<T>(
+    pub async fn list(
         razorpay: &Razorpay,
-        params: T,
-    ) -> RazorpayResult<Collection<Invoice>>
-    where
-        T: for<'a> Into<Option<ListInvoices<'a>>>,
-    {
+        params: Option<ListInvoices<'_>>,
+    ) -> RazorpayResult<Collection<Invoice>> {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/invoices".to_owned(),
                 version: None,
-                data: params.into(),
+                data: params,
             })
             .await?;
 
