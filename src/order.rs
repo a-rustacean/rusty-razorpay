@@ -108,19 +108,16 @@ impl Order {
         }
     }
 
-    pub async fn list<T>(
+    pub async fn list(
         razorpay: &Razorpay,
-        params: T,
-    ) -> RazorpayResult<Collection<Order>>
-    where
-        T: for<'a> Into<Option<ListOrders<'a>>>,
-    {
+        params: Option<ListOrders<'_>>,
+    ) -> RazorpayResult<Collection<Order>> {
         let res = razorpay
             .api
             .get(RequestParams {
                 url: "/orders".to_owned(),
                 version: None,
-                data: params.into(),
+                data: params,
             })
             .await?;
 
