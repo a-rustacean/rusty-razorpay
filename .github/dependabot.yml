@@ -1,3 +1,4 @@
+version: 2
 updates:
   # Maintain dependencies for Cargo
   - package-ecosystem: cargo
@@ -8,6 +9,20 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
+    assignees:
+      - "a-rustacean"
+    reviewers:
+      - "a-rustacean"
+
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "ci(deps)"
+      prefix-development: "ci(deps-dev)"
     assignees:
       - "a-rustacean"
     reviewers:
