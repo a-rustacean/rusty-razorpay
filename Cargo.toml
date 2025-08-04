@@ -21,7 +21,7 @@ smol_str = "0.3"
 hashbrown = { version = "0.15.4", features = ["serde"] }
 
 [dev-dependencies]
-tokio = { version = "1.47.0", features = ["full"] }
+tokio = { version = "1.47.1", features = ["full"] }
 
 [features]
 default = ["std"]
